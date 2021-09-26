@@ -76,35 +76,56 @@ namespace WpfApp1
 
         void Render()
         {
-            Sphere sphere = new Sphere(2.0, new Vector3D(0, 0, -10));
-            Vector3D cameraPos = new Vector3D(0,0,5);
-            for(int h = 0; h < height; h++)
+            //Initialize Background
+            for (int h = 0; h < height; h++)
             {
                 for (int w = 0; w < width; w++)
                 {
-                    int index =( h * width + w) *4;
-                    Vector3D pixPos = new Vector3D(w/255.0-1.0, h/255.0-1.0, 0);
-                    Vector3D dir = pixPos - cameraPos;
-                    dir.Normalize();
-
-                    Ray ray = new Ray(cameraPos, dir);
-
-                    if(sphere.Hit(ray))
-                    {
-                        pixels[index + 0] = 255;
-                        pixels[index + 1] = (byte)(w / 2);
-                        pixels[index + 2] = (byte)(h / 2);
-                        pixels[index + 3] = 255;
-                    }
-                    else
-                    {
+                    int index = (h * width + w) * 4;
+                    
+                    
                         pixels[index + 0] = 0;
                         pixels[index + 1] = 0;
                         pixels[index + 2] = 0;
                         pixels[index + 3] = 255;
-                    }
                 }
             }
+
+            List<Sphere> sphereList = new List<Sphere>();
+            Sphere sphere1 = new Sphere(1.0, new Vector3D(0, 0, -10));
+            Sphere sphere2 = new Sphere(3.8, new Vector3D(2, 2, -20));
+            sphereList.Add(sphere1);
+            sphereList.Add(sphere2);
+
+            Vector3D cameraPos = new Vector3D(0,0,5);
+
+            int sphereCount=0;
+            foreach(Sphere sphere in sphereList)
+            {
+                for (int h = 0; h < height; h++)
+                {
+                    for (int w = 0; w < width; w++)
+                    {
+                        int index = (h * width + w) * 4;
+                        Vector3D pixPos = new Vector3D(w / 255.0 - 1.0, h / 255.0 - 1.0, 0);
+                        Vector3D dir = pixPos - cameraPos;
+                        dir.Normalize();
+
+                        Ray ray = new Ray(cameraPos, dir);
+
+                        if (sphere.Hit(ray))
+                        {
+                            pixels[index + 0] = 255;
+                            pixels[index + 1] = (byte)(50*sphereCount);
+                            pixels[index + 2] = (byte)(50*sphereCount);
+                            pixels[index + 3] = 255;
+                        }
+                        
+                    }
+                }
+                sphereCount++;
+            }
+            
         }
 
         void SetImage()
