@@ -372,6 +372,7 @@ GameObject:
   - component: {fileID: 1022460123}
   - component: {fileID: 1022460125}
   - component: {fileID: 1022460124}
+  - component: {fileID: 1022460126}
   m_Layer: 5
   m_Name: Wave Count
   m_TagString: Untagged
@@ -431,7 +432,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Wave
+  m_Text: 
 --- !u!222 &1022460125
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -440,6 +441,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1022460122}
   m_CullTransparentMesh: 1
+--- !u!114 &1022460126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1022460122}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e93b3e8d529b86149a87096d723e0ad6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1464685812
 GameObject:
   m_ObjectHideFlags: 0

@@ -8,6 +8,9 @@ TagManager:
   - Collectible
   - Ground
   - Grid
+  - Projectile
+  - Zombie
+  - TopCamera
   layers:
   - Default
   - TransparentFX

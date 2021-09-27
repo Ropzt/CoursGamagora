@@ -1680,7 +1680,7 @@ GameObject:
   - component: {fileID: 1607767424752198756}
   m_Layer: 0
   m_Name: Zombie1
-  m_TagString: Untagged
+  m_TagString: Zombie
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1777,6 +1777,7 @@ MonoBehaviour:
   parentNode: {fileID: 0}
   neighbourNode: []
   walkable: 1
+  zombie: 0
 --- !u!114 &1607767424752198756
 MonoBehaviour:
   m_ObjectHideFlags: 0
