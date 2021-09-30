@@ -30,6 +30,7 @@ public class ZombieBehavior : MonoBehaviour
         path = shortPath.findShortestPath(gameObject, playerObj);
         pathIndex=0;
         nextNodePosition = path[0].transform.position;
+
     }
 
     // Update is called once per frame

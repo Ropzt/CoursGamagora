@@ -44,26 +44,62 @@ public class NodeGenerator : MonoBehaviour
             {
 
                 Node noeud = nodeList[nodeIndex].GetComponent<Node>();
-
-                if( (nodeIndex + (2*zMax)) < ((2*xMax)*(2*zMax)) )
+                Node upperNode = new Node();
+                Node lowerNode = new Node();
+                Node rightNode = new Node();
+                Node leftNode = new Node();
+                //Upper neighbour
+                if ( (nodeIndex + (2*zMax)) < ((2*xMax)*(2*zMax)) )
                 {
                     noeud.addNeighbourNode(nodeList[(int)(nodeIndex + (2*zMax)+1)]);
+                    upperNode = nodeList[(int)(nodeIndex + (2 * zMax) + 1)].GetComponent<Node>();
                 }
 
-                if( (nodeIndex - (2*zMax)) >= 0)
+                //Lower neighbour
+                if ( (nodeIndex - (2*zMax)) >= 0)
                 {
                     noeud.addNeighbourNode(nodeList[(int)(nodeIndex - (2*zMax))]);
+                    lowerNode = nodeList[(int)(nodeIndex - (2 * zMax))].GetComponent<Node>();
                 }
 
-                if( (nodeIndex + 1) < ((2*xMax)*(2*zMax)) )
+                //Right neighbour
+                if ( (nodeIndex + 1) < ((2*xMax)*(2*zMax)) )
                 {
                     noeud.addNeighbourNode(nodeList[(nodeIndex + 1)]);
+                    rightNode = nodeList[(nodeIndex + 1)].GetComponent<Node>();
                 }
 
-                if( (nodeIndex - 1) >= 0)
+                //Left neighbour
+                if ( (nodeIndex - 1) >= 0)
                 {
                     noeud.addNeighbourNode(nodeList[(nodeIndex - 1)]);
+                    leftNode = nodeList[(nodeIndex - 1)].GetComponent<Node>();
                 }
+
+
+                //Need to prevent links between the node and diagonal neighbours that trespass a wall (Diagonal UpperLeft is ok if Upper OR Left aren't walls)
+
+                //Upper Right neighbour
+                if ( ((nodeIndex + (2 * zMax)+1) < ((2 * xMax) * (2 * zMax))) & (upperNode.isWalkable() & rightNode.isWalkable()) )
+                {
+                    noeud.addNeighbourNode(nodeList[(int)(nodeIndex + (2 * zMax) + 2)]);
+                }
+                //Upper Left neighbour
+                if (((nodeIndex + (2 * zMax)-1) < ((2 * xMax) * (2 * zMax))) & (upperNode.isWalkable() & leftNode.isWalkable()))
+                {
+                    noeud.addNeighbourNode(nodeList[(int)(nodeIndex + (2 * zMax))]);
+                }
+                //Lower Right neighbour
+                if (((nodeIndex - (2 * zMax)+1) >= 0) & (lowerNode.isWalkable() & rightNode.isWalkable()))
+                {
+                    noeud.addNeighbourNode(nodeList[(int)(nodeIndex - (2 * zMax))+1]);
+                }
+                //Lower Left neighbour
+                if (((nodeIndex - (2 * zMax)-1) >= 0) & (lowerNode.isWalkable() & leftNode.isWalkable()))
+                {
+                    noeud.addNeighbourNode(nodeList[(int)(nodeIndex - (2 * zMax))-1]);
+                }
+
                 nodeIndex++;              
             }
         }
@@ -85,7 +121,7 @@ public class NodeGenerator : MonoBehaviour
                     nodeObj.transform.position.z == -zMax |
                     nodeObj.transform.position.x == xMax |
                     nodeObj.transform.position.x == -xMax |
-                    Random.value < 0.1f)
+                    Random.value < 0.2f)
                 {
                     noeud.setWalkable(false);
                     GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);

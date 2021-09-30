@@ -5,6 +5,7 @@ using UnityEngine;
 public class Node : MonoBehaviour {
 
     [SerializeField] private float weight = int.MaxValue;
+    [SerializeField] private float ponderedWeight = int.MaxValue;
     [SerializeField] private Vector3 position = new Vector3();
     [SerializeField] private GameObject parentNode = null;
     [SerializeField] private List<GameObject> neighbourNode;
@@ -21,12 +22,19 @@ public class Node : MonoBehaviour {
     public void resetNode()
     {
         weight = int.MaxValue;
+        ponderedWeight = int.MaxValue;
         parentNode = null;
+    }
+
+    /// Set the weight value.
+    public void resetPonderedWeight()
+    {
+        this.ponderedWeight = int.MaxValue;
     }
 
     // -------------------------------- Setters --------------------------------
 
-   
+
     /// Set the parent node.
     public void setParentNode(GameObject node)
     {
@@ -46,7 +54,13 @@ public class Node : MonoBehaviour {
         this.weight = value;
     }
 
-    
+    /// Set the weight value.
+    public void setPonderedWeight(float value)
+    {
+        this.ponderedWeight = value;
+    }
+
+
     /// Set is node is walkable.
     public void setWalkable(bool value)
     {
@@ -83,6 +97,13 @@ public class Node : MonoBehaviour {
         float result = this.weight;
         return result;
 
+    }
+
+    /// Set the weight value.
+    public float getPonderedWeight()
+    {
+        float result = this.ponderedWeight;
+        return result;
     }
 
     public Vector3 getPosition()
