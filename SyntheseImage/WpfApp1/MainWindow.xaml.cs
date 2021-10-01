@@ -108,9 +108,9 @@ namespace WpfApp1
         public double getSphereIntersectT(Vector3D center, double Radius = 0)
         {
             
-            Vector3D co =  Origin - center ; //Vecteur qui part de center vers ray.origine(pour les sphere)
-            double b = Vector3D.DotProduct(Direction, co);
-            double c = Vector3D.DotProduct(co, co) - (Radius * Radius);
+            Vector3D co = Origin - center; //Vecteur qui part de center vers ray.origine(pour les sphere)
+            double b = Vector3D.DotProduct(Direction,co);
+            double c = Vector3D.DotProduct(co, co) -(Radius * Radius);
             double delta = b * b - c; //Get discriminant (a modifier : -(4*c) ???)
             if (delta < 0)
             {
@@ -294,10 +294,12 @@ namespace WpfApp1
             }
 
             List<Sphere> sphereList = new List<Sphere>();
-            Sphere sphere1 = new Sphere(1.0, new Vector3D(0, 0, -10));
+            Sphere sphere1 = new Sphere(0.5, new Vector3D(0, 0.5, -9));
             Sphere sphere2 = new Sphere(1.0, new Vector3D(1, 1, -11));
+            Sphere sphere3 = new Sphere(1.0, new Vector3D(-1, 1, -11));
             sphereList.Add(sphere1);
             sphereList.Add(sphere2);
+            sphereList.Add(sphere3);
 
             Vector3D cameraPos = new Vector3D(0,0,5);
 
@@ -327,69 +329,66 @@ namespace WpfApp1
                             Vector3D normalIntersec = pointIntersec - sphere.Center;
                             normalIntersec.Normalize();
 
-                            //place light source and calculate the direction vector to the intersect point
-                            LightSource lightSource = new LightSource(new Vector3D(-3, -1, -4));
+                            double shadingTotal = new double();
+                            
+                            Sphere lightSphere = new Sphere(1.0, new Vector3D(0, 0, -5));
+                            double x = (lightSphere.Center - pointIntersec).X * 0.0001;
+                            double y = (lightSphere.Center - pointIntersec).Y * 0.0001;
+                            double z = (lightSphere.Center - pointIntersec).Z * 0.0001;
+                            Vector3D intersecOffseted = pointIntersec + new Vector3D(x, y, z);
 
-                            //calculate the intersect point with offset
-                            double x = (lightSource.Origin - pointIntersec).X* 0.0001;
-                            double y = (lightSource.Origin - pointIntersec).Y* 0.0001;
-                            double z = (lightSource.Origin - pointIntersec).Z* 0.0001;
-                            Vector3D intersecOffseted = pointIntersec + new Vector3D(x,y,z);
 
-                            //Calculate direction vector light-intersect
-                            Vector3D co = lightSource.Origin - intersecOffseted;
+                            //Loop multiple ray for spherical lightSource to get diffuse shadows
+
+                            /*
+                            //Calculate direction vector from intersect to light.Center
+                            Vector3D co = lightSphere.Center - pointIntersec;
+                            co.Normalize();
                             Ray intersecRay = new Ray(intersecOffseted, co);
-                            double tLight = intersecRay.getPointIntersectT(lightSource.Origin);
+                            double tLight = intersecRay.getSphereIntersectT(lightSphere.Center, lightSphere.Radius);
 
 
-                            if (tLight == 0)
+                            if (tLight != 0)
                             {
                                
                                 double tShadow = 0;
                                 double tShadowMax = 0;
                                 
                                 bool hit = false;
-                                
+
                                 foreach (Sphere sphereObstacle in sphereList)
                                 {
-                                    /*
-                                    hit = intersecRay.isSphereHit(sphereObstacle.Center, sphereObstacle.Radius);
-                                    if (hit)
-                                        break;
-                                    */
-                                    tShadowMax = 0;
+
+                                    //tShadowMax = 0;
                                     tShadow = intersecRay.getSphereIntersectT(sphereObstacle.Center, sphereObstacle.Radius);
-                                    if (tShadow>tShadowMax)
+                                    if (tShadow > tShadowMax)
                                     {
                                         tShadowMax = tShadow;
                                     }
                                 }
+
                                 
-                                /*
-                                 A faire : tShadowMax est toujours égal à zéro, cela veut dire qu'il prend en compte son intersection avec sa sphere 
-                                ((t négatif ??) et se bloque net avant de tester les autres spheres)
-                                Peut etre un probleme avec la direction du ray et de co (inverser co et inverser les t ??)
-                                 */
-                                if(tShadowMax==0)
+                                if (tShadowMax==0)
                                 {
                                     //compute the quantity of light given an intensity
-                                    double intensity = 50;
-                                    double shading = Vector3D.DotProduct(normalIntersec, co) * intensity;
+                                    double intensity = 1000;
+                                    double shading = Vector3D.DotProduct(normalIntersec, co)  * (intensity/tLight);
+                                    shadingTotal += shading;
 
                                     //Clamp
-                                    if (shading < 0)
+                                    if (shadingTotal < 0)
                                     {
-                                        shading = 0;
+                                        shadingTotal = 0;
                                     }
-                                    if (shading > 255)
+                                    if (shadingTotal > 255)
                                     {
-                                        shading = 255;
+                                        shadingTotal = 255;
                                     }
 
                                     //Print
-                                    pixels[index + 0] = (byte)shading;
+                                    pixels[index + 0] = (byte)shadingTotal;
                                     pixels[index + 1] = 0;
-                                    pixels[index + 2] = 0;
+                                    pixels[index + 2] = (byte)(shadingTotal/1.5); //j'aime le violet
                                     pixels[index + 3] = 255;
                                 }
                                 else
@@ -409,52 +408,90 @@ namespace WpfApp1
                                 pixels[index + 2] = 0;
                                 pixels[index + 3] = 255;
                             }
+                            */
                             
-                            /*
                             //Trace ray from intersection point and search for light source or obstacles
-                            int nb_meridiens = 10;
-                            int nb_paralleles = 10;
+                            int nb_meridiens = 20;
+                            int nb_paralleles = 20;
+                            int nb_rays2Light = nb_meridiens * nb_paralleles;
+                            double decalage = Vector3D.DotProduct(normalIntersec, new Vector3D(0,0,1));
+                            double decalageInv = Math.Acos(decalage);
+
                             for (int j = 0; j < nb_paralleles; j++)  
                             {
                                 double phi = ((Math.PI * j) / nb_paralleles);
                                 for (int i = 0; i < nb_meridiens; i++)
                                 {
-
                                     double angle = ((2*Math.PI * i) / nb_meridiens);
 
-                                    double decalage = Vector3D.DotProduct(normalIntersec, new Vector3D(1,1,1));
-                                    double decalageInv = Math.Acos(decalage);
+                                    double xDir = lightSphere.Radius * Math.Cos(angle+decalageInv) * Math.Sin(phi);
+                                    double yDir = lightSphere.Radius * Math.Sin(angle+decalageInv) * Math.Sin(phi);
+                                    double zDir = lightSphere.Radius * Math.Cos(phi);
 
-                                    double x = Math.Cos(angle+decalageInv) * Math.Sin(phi);
-                                    double y = Math.Sin(angle+decalageInv) * Math.Sin(phi);
-                                    double z = Math.Cos(phi);
+                                    Vector3D pointOnLightSphere = new Vector3D(xDir, yDir, zDir);
 
-                                    Vector3D rayDir = new Vector3D(x, y, z);
-                                    rayDir.Normalize();
-                                    Ray rayIntersec = new Ray(pointIntersec, rayDir);
+                                    //Calculate direction vector from intersect to light.Center
+                                    Vector3D co = pointOnLightSphere - pointIntersec;
+                                    co.Normalize();
+                                    Ray intersecRay = new Ray(intersecOffseted, co);
+                                    double tLight = intersecRay.getSphereIntersectT(lightSphere.Center, lightSphere.Radius);
 
-                                    Vector3D co = rayIntersec.Origin - lightSource.Origin; //Get initial position
-                                    double b = Vector3D.DotProduct(rayIntersec.Direction, co);
-                                    double c = Vector3D.DotProduct(co, co)-1*1;
-                                    double delta = b * b - c; //Get discriminant (a modifier : -(4*c) ???)
-                                    if (delta > 0)
+                                    if (tLight != 0)
                                     {
-                                        //compute the quantity of light given an intensity
-                                        double intensity = 200;
-                                        double shading = -(Vector3D.DotProduct(normalIntersec, rayIntersec.Direction) * intensity);
+                               
+                                        double tShadow = 0;
+                                        double tShadowMax = 0;
+                                
+                                        bool hit = false;
 
-                                        //Clamp
-                                        if (shading < 0)
+                                        foreach (Sphere sphereObstacle in sphereList)
                                         {
-                                            shading = 0;
-                                        }
-                                        if (shading > 255)
-                                        {
-                                            shading = 255;
+
+                                            //tShadowMax = 0;
+                                            tShadow = intersecRay.getSphereIntersectT(sphereObstacle.Center, sphereObstacle.Radius);
+                                            if (tShadow > tShadowMax)
+                                            {
+                                                tShadowMax = tShadow;
+                                            }
                                         }
 
+                                
+                                        if (tShadowMax==0)
+                                        {
+                                            //compute the quantity of light given an intensity
+                                            double intensity = 1000/nb_rays2Light;
+                                            double shading = Vector3D.DotProduct(normalIntersec, co)  * (intensity/tLight);
+                                            shadingTotal += shading;
+
+                                            //Clamp
+                                            if (shadingTotal < 0)
+                                            {
+                                                shadingTotal = 0;
+                                            }
+                                            if (shadingTotal > 255)
+                                            {
+                                                shadingTotal = 255;
+                                            }
+
+                                            //Print
+                                            pixels[index + 0] = (byte)shadingTotal;
+                                            pixels[index + 1] = 0;
+                                            pixels[index + 2] = (byte)(shadingTotal/1.5); //j'aime le violet
+                                            pixels[index + 3] = 255;
+                                        }
+                                        else
+                                        {
+                                            //Print
+                                            pixels[index + 0] = 0;
+                                            pixels[index + 1] = 0;
+                                            pixels[index + 2] = 0; //red for debug
+                                            pixels[index + 3] = 255;
+                                        }
+                                    }
+                                    else
+                                    {
                                         //Print
-                                        pixels[index + 0] = (byte)shading;
+                                        pixels[index + 0] = 0;
                                         pixels[index + 1] = 0;
                                         pixels[index + 2] = 0;
                                         pixels[index + 3] = 255;
@@ -462,11 +499,11 @@ namespace WpfApp1
 
                                 }
                             }
-                            */
+                            
 
-                            
-                            
-                            
+
+
+
                         }
                         sphereCount++;
                     }
