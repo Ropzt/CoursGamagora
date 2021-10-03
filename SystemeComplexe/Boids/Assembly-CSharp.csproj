@@ -53,9 +53,14 @@
     <UnityVersion>2020.3.18f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Assets\BoidsBehavior.cs" />
-    <Compile Include="Assets\CollisionRange.cs" />
-    <Compile Include="Assets\Movement.cs" />
+    <Compile Include="Assets\MyScripts\BoidsBehavior.cs" />
+    <Compile Include="Assets\MyScripts\Movement.cs" />
+    <Compile Include="Assets\MyScripts\CollisionRange.cs" />
+    <Compile Include="Assets\BoidManager.cs" />
+    <Compile Include="Assets\MyScripts\SpawnManager.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\BoidCompute.compute" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

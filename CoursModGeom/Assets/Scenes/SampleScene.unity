@@ -153,10 +153,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat: {fileID: 2100000, guid: 9914c3884b27d754cac3800e378bb68c, type: 2}
-  nb_paralleles: 20
+  nb_paralleles: 1
   nb_meridiens: 20
   rayon: 5
   isSphere: 1
+  isCone: 1
 --- !u!4 &121956523
 Transform:
   m_ObjectHideFlags: 0
