@@ -2188,6 +2188,7 @@ GameObject:
   - component: {fileID: 7732275198737942091}
   - component: {fileID: 5132598811050296516}
   - component: {fileID: 5137853603828575888}
+  - component: {fileID: 3919149436199886165}
   m_Layer: 0
   m_Name: Zombie2
   m_TagString: Zombie
@@ -2274,7 +2275,7 @@ MonoBehaviour:
   position: {x: 0, y: 0, z: 0}
   parentNode: {fileID: 0}
   neighbourNode: []
-  walkable: 1
+  walkable: 0
   zombie: 0
 --- !u!114 &5132598811050296516
 MonoBehaviour:
@@ -2301,6 +2302,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 1
+  steerWeight: 10
+--- !u!114 &3919149436199886165
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7010094146595100421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07286f7fb4de9f349a9c844dff4a0fc0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minSpeed: 1
+  maxSpeed: 3
+  maxSteerForce: 3
+  position: {x: 0, y: 0, z: 0}
+  forward: {x: 0, y: 0, z: 0}
+  cachedTransform: {fileID: 0}
 --- !u!1 &7147683797603389332
 GameObject:
   m_ObjectHideFlags: 0

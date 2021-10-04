@@ -6,13 +6,16 @@ public class ZombieBehaviorAstar : MonoBehaviour
 {
     
     private AstarPathfinding shortPathA;
+    private Movement mov;
     private GameObject playerObj;
     private NodeGenerator grid;
     private Node noeud;
-    [SerializeField] private float speed = 1f;
+
+    [SerializeField] private float steerWeight = 10f;
     private Vector3 nextNodePosition;
     private List<GameObject> path;
     private int pathIndex;
+
 
     // Start is called before the first frame update
     void Awake()
@@ -20,6 +23,7 @@ public class ZombieBehaviorAstar : MonoBehaviour
 
         grid = GameObject.FindGameObjectWithTag("Grid").GetComponent<NodeGenerator>();
         shortPathA = GetComponent<AstarPathfinding>();
+        mov = GetComponent<Movement>();
         noeud = GetComponent<Node>();
         noeud.setZombie(true);
 
@@ -60,10 +64,11 @@ public class ZombieBehaviorAstar : MonoBehaviour
 
     void MoveToNextNode(Vector3 nextNodePosition)
     {
+        Vector3 acceleration = Vector3.zero;
         Vector3 direction = nextNodePosition - transform.position;
-        direction.Normalize();
-        transform.Translate(direction * speed * 0.01f);
-        transform.forward = direction;
+        Vector3 steeringForce = mov.SteerTowards(direction) * steerWeight;
+        acceleration += steeringForce;
+        mov.Move(acceleration);
     }
 
     void LinkToNearNeighbours()

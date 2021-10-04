@@ -20,7 +20,7 @@ public class BoidManager : MonoBehaviour {
 
     void Update () 
     {
-        if (boids != null) {
+        if (boids.Length != 0) {
 
             int numBoids = boids.Length;
             var boidData = new BoidData[numBoids];
@@ -55,6 +55,10 @@ public class BoidManager : MonoBehaviour {
             }
 
             boidBuffer.Release ();
+        }
+        else
+        {
+            boids = GameObject.FindGameObjectsWithTag("Boid");
         }
     }
 

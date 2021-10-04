@@ -128,6 +128,8 @@ public class NodeGenerator : MonoBehaviour
                     cube.transform.parent = nodeObj.transform;
                     cube.transform.localPosition = new Vector3(0f, 0f, 0f);
                     cube.transform.localScale = new Vector3(1f, 5f, 1f);
+                    BoxCollider cubeCollider = cube.GetComponent<BoxCollider>();
+                    cubeCollider.size.Set(1f,5f,1f);
                 }
                 else
                 {
@@ -154,7 +156,7 @@ public class NodeGenerator : MonoBehaviour
                 playerPos = nodePosition.getPosition();
             }
         }
-        GameObject playerObj = GameObject.Instantiate(playerPrefab, playerPos, new Quaternion());
+        GameObject playerObj = GameObject.Instantiate(playerPrefab, new Vector3(playerPos.x,0f,playerPos.z), new Quaternion());
         PlayerController pCtrl = playerObj.GetComponent<PlayerController>();
         pCtrl.LinkToNearNeighbours();
     }

@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Characters\ZombieBehavior.cs" />
     <Compile Include="Assets\Scripts\Props\BulletMove.cs" />
+    <Compile Include="Assets\Scripts\Characters\ZombieBehaviorAstar.cs" />
     <Compile Include="Assets\Scripts\UI\waveCounter.cs" />
     <Compile Include="Assets\Scripts\Characters\PlayerController.cs" />
     <Compile Include="Assets\Scripts\GridNodeDijkstra\Dijkstra.cs" />
@@ -62,7 +63,7 @@
     <Compile Include="Assets\Scripts\Managers\SpawnManager.cs" />
     <Compile Include="Assets\Scripts\GridNodeDijkstra\NodeGenerator.cs" />
     <Compile Include="Assets\Scripts\GridNodeDijkstra\AstarPathfinding.cs" />
-    <Compile Include="Assets\Scripts\Characters\ZombieBehaviorAstar.cs" />
+    <Compile Include="Assets\Scripts\Movement.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
