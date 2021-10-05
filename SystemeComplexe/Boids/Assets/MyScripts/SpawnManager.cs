@@ -13,9 +13,9 @@ public class SpawnManager : MonoBehaviour
         {
             GameObject boid = Instantiate(_boidPrefab);
             boid.transform.parent = transform;
-            float x = Random.Range(-10f, 10f);
-            float y = Random.Range(-10f, 10f);
-            float z = Random.Range(-10f, 10f);
+            float x = Random.Range(-5f, 5f);
+            float y = Random.Range(-5f, 5f);
+            float z = Random.Range(-5f, 5f);
             boid.transform.position = new Vector3(x,y,z);
         }
     }
