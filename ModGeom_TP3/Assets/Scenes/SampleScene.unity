@@ -159,9 +159,9 @@ MonoBehaviour:
   posX_Sphere1: -0.1
   posY_Sphere1: -0.1
   posZ_Sphere1: -0.1
-  posX_Sphere2: 0.05
-  posY_Sphere2: 0.05
-  posZ_Sphere2: 0.05
+  posX_Sphere2: 0.1
+  posY_Sphere2: 0.1
+  posZ_Sphere2: 0.1
 --- !u!4 &321775320
 Transform:
   m_ObjectHideFlags: 0

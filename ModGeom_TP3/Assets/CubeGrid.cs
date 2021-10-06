@@ -104,7 +104,7 @@ public class CubeGrid : MonoBehaviour
                                 }
                             }
                         }
-                        else if(result>-(newPas/4f))
+                        else if(result>-(newPas/2f))
                         {
                             computedCubes.Add(cubeCenter);
                             GameObject cubeObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
