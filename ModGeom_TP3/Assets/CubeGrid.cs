@@ -25,11 +25,7 @@ public class CubeGrid : MonoBehaviour
         Vector3 centerSphere1 = new Vector3(posX_Sphere1, posY_Sphere1, posZ_Sphere1);
         Vector3 centerSphere2 = new Vector3(posX_Sphere2, posY_Sphere2, posZ_Sphere2);
 
-        /*
-        List<Vector3> centreSpheres = new List<Vector3>();
-        centreSpheres.Add(centerSphere1);
-        centreSpheres.Add(centerSphere2);
-        */
+        
         
         Vector3[] centreSpheres = new Vector3[nb_sphere];
         centreSpheres[0] = centerSphere1;
@@ -38,10 +34,7 @@ public class CubeGrid : MonoBehaviour
 
         float minHeight = (Vector3.Distance(centerSphere1, centerSphere2) + sphere_Radius + sphere_Radius)*4f;
 
-        /*
-        float cube_height = (nb_recursion * 4) / 2;
-        float pas = height/(cube_height*2);
-        */
+        
 
         int nb_recursion = 5;
         float nb_cubes = Mathf.Pow(2f,nb_recursion);
@@ -90,15 +83,15 @@ public class CubeGrid : MonoBehaviour
         {
             if(!computedCubes.Contains(cubeCenter))
             {
-                //foreach(Vector3 sphereCenter in centreSpheres)
+                
                 for (int i = 0; i < nb_sphere; i++)
                 {
-                    //if ((Mathf.Pow((sphereCenter.x - cubeCenter.x), 2) + Mathf.Pow((sphereCenter.y - cubeCenter.y), 2) + Mathf.Pow((sphereCenter.z - cubeCenter.z), 2) - Mathf.Pow(sphere_Radius, 2)) < 0)
-                    if ((Mathf.Pow((centreSpheres[i].x - cubeCenter.x), 2) + Mathf.Pow((centreSpheres[i].y - cubeCenter.y), 2) + Mathf.Pow((centreSpheres[i].z - cubeCenter.z), 2) - Mathf.Pow(sphere_Radius, 2)) < 0)
+                    float result = (Mathf.Pow((centreSpheres[i].x - cubeCenter.x), 2) + Mathf.Pow((centreSpheres[i].y - cubeCenter.y), 2) + Mathf.Pow((centreSpheres[i].z - cubeCenter.z), 2) - Mathf.Pow(sphere_Radius, 2));
+                    if (result < 0)
                     {
                         if (isIntersection)
                         {
-                            //foreach (Vector3 sphereCenterLvl2 in centreSpheres)
+                            
                             for (int j = i + 1; j < nb_sphere; j++)
                             {
                                 if ((Mathf.Pow((centreSpheres[j].x - cubeCenter.x), 2) + Mathf.Pow((centreSpheres[j].y - cubeCenter.y), 2) + Mathf.Pow((centreSpheres[j].z - cubeCenter.z), 2) - Mathf.Pow(sphere_Radius, 2)) < 0)
@@ -111,7 +104,7 @@ public class CubeGrid : MonoBehaviour
                                 }
                             }
                         }
-                        else
+                        else if(result>-(newPas/4f))
                         {
                             computedCubes.Add(cubeCenter);
                             GameObject cubeObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -125,9 +118,5 @@ public class CubeGrid : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
 }

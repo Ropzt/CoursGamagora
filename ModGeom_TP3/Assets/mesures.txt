@@ -1,0 +1,37 @@
+-Passer à Pole Emploi :
+	- Est ce que je peux chomage ?
+	- Est ce que je peux inscrire Octobre/Novembre 2022 ? Inscrire avant fin stage ?
+
+
+CAF LYON :
+	- Chambre + 12200€ salaire declaré -> entre 29 et 69€ par mois
+	- Appart Colocation + 12200€ déclaré -> entre 51 et 91€ par mois
+	-
+
+Uninstall Unreal -> Move to D:/
+Uninstall Unity -> Move to D:/ ???
+Uninstall Anaconda -> Move to D:/
+Uninstall Xampp -> Move to D:/
+
+
+Devoirs:
+
+Fractal Worlds to parkour in, with boids flying around
+Scene is loaded progressively as you explore
+Since is fractal, you can get smaller/larger in order to escape the bad guy(s?)
+
+
+
+6 recursions :
+Quarter 2 Sphere no intersec
+Sphere radius = 0.05
+Sphere1(0.05,0.05,0.05)
+Sphere1(-0.05,-0.05,-0.05)
+maxAnyDir = 0.05
+
+Same result =
+5 recursions :
+Sphere radius = 0.1
+Sphere1(0.1,0.1,0.1)
+Sphere1(-0.1,-0.1,-0.1)
+maxAnyDir = 0.1

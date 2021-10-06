@@ -156,12 +156,12 @@ MonoBehaviour:
   cube_size: 1
   isIntersection: 0
   nb_sphere: 2
-  posX_Sphere1: 0.05
-  posY_Sphere1: 0.05
-  posZ_Sphere1: 0.05
-  posX_Sphere2: -0.05
-  posY_Sphere2: -0.05
-  posZ_Sphere2: -0.05
+  posX_Sphere1: -0.1
+  posY_Sphere1: -0.1
+  posZ_Sphere1: -0.1
+  posX_Sphere2: 0.05
+  posY_Sphere2: 0.05
+  posZ_Sphere2: 0.05
 --- !u!4 &321775320
 Transform:
   m_ObjectHideFlags: 0
