@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 1bdb1b3b0abe98b488be90c423bf025c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -156,4 +156,7 @@ MonoBehaviour:
   numPerceivedFlockmates: 0
   alignWeight: 1
   cohesionWeight: 1
-  seperateWeight: 1
+  seperateWeight: 3
+  targetWeight: 30
+  hasTarget: 1
+  target: {fileID: 0}

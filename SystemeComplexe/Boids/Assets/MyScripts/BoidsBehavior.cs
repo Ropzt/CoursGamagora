@@ -21,16 +21,25 @@ public class BoidsBehavior : MonoBehaviour
 
     public float alignWeight = 1;
     public float cohesionWeight = 1;
-    public float seperateWeight = 1;
+    public float seperateWeight = 3f;
+    public float targetWeight = 30f;
 
     Movement mov;
     CollisionRange colRange;
 
+    [SerializeField] private bool hasTarget = true;
+    public GameObject target;
+
     // Start is called before the first frame update
     void Start()
     {
+        
         mov = GetComponent<Movement>();
         colRange = GetComponent<CollisionRange>();
+        if(hasTarget)
+        {
+            target = GameObject.FindGameObjectWithTag("Target");
+        }
     }
 
     // Update is called once per frame
@@ -38,6 +47,13 @@ public class BoidsBehavior : MonoBehaviour
     {
         //Reset acceleration
         Vector3 acceleration = Vector3.zero;
+
+        if(hasTarget)
+        {
+            Vector3 offsetToTarget = (new Vector3(target.transform.position.x, (target.transform.position.y+Random.Range(-1f,1f)), target.transform.position.z) - mov.position);
+            var targetForce = mov.SteerTowards(offsetToTarget) * targetWeight;
+            acceleration += targetForce;
+        }
 
         if (numPerceivedFlockmates != 0)
         {
