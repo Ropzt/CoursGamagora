@@ -52,6 +52,7 @@ public class AstarPathfinding : MonoBehaviour
 
         while (unexplored.Count > 0)
         {
+            
             // Sort the unexplored by their weight 
             //unexplored.Sort((x, y) => x.GetComponent<Node>().getWeight().CompareTo(y.GetComponent<Node>().getWeight()));
             //faire le sorting par poids ponderés
@@ -79,6 +80,7 @@ public class AstarPathfinding : MonoBehaviour
                 // We want to avoid those that had been explored and is not walkable.
                 if (unexplored.Contains(neighNode) && node.isWalkable())
                 {
+                    
                     // Get the distance of the object.
                     float distance = Vector3.Distance(node.getPosition(), currentNode.getPosition());
                     distance = currentNode.getWeight() + distance;
@@ -86,10 +88,12 @@ public class AstarPathfinding : MonoBehaviour
                     // Get the distance of the destination.
                     float distance2End = Vector3.Distance(node.getPosition(),endNode.getPosition());
                     float ponderedDistance = distance+distance2End;
-
+                    Debug.Log("distance ="+distance);
+                    Debug.Log("node wieght ="+node.getWeight());
                     // If the added distance is less than the current weight.
                     if (distance < node.getWeight())
                     {
+                        
                         // We update the new distance as weight and update the new path now.
                         node.setWeight(distance);
                         node.setPonderedWeight(ponderedDistance);

@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        /*
         UpdateCamera();
 
         Move();
@@ -35,6 +36,7 @@ public class PlayerController : MonoBehaviour
         {
             Shoot();
         }
+        */
     }
 
     public void LinkToNearNeighbours()
@@ -52,9 +54,12 @@ public class PlayerController : MonoBehaviour
         //Link to nearest node's neighbours
         foreach(GameObject neighbour in nearestNodeNode.getNeighbourNode())
         {
-            noeud.addNeighbourNode(neighbour);
-            Node neighbourNode = neighbour.GetComponent<Node>();
-            neighbourNode.addNeighbourNode(gameObject);
+            if(neighbour.tag != "Player")
+            {
+                noeud.addNeighbourNode(neighbour);
+                Node neighbourNode = neighbour.GetComponent<Node>();
+                neighbourNode.addNeighbourNode(gameObject);
+            }
         }
     }
 

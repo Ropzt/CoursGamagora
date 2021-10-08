@@ -36,6 +36,7 @@ public class ZombieBehaviorAstar : MonoBehaviour
         path = shortPathA.findShortestPath(gameObject, playerObj);
         pathIndex = 0;
         nextNodePosition = path[0].transform.position;
+        Debug.Log("Next Node Pos=" + nextNodePosition);
 
     }
 
@@ -50,6 +51,7 @@ public class ZombieBehaviorAstar : MonoBehaviour
             {
                 pathIndex++;
                 nextNodePosition = path[pathIndex].transform.position;
+                Debug.Log("Next Node Pos=" + nextNodePosition);
             }
             else
             {

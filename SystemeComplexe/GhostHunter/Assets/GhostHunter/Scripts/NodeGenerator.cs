@@ -11,6 +11,7 @@ public class NodeGenerator : MonoBehaviour
     public float zMax;
     public List<GameObject> nodeList;
     [SerializeField] private int nb_Spawn = 3;
+    public Material mat;
 
     // Start is called before the first frame update
     void Start()
@@ -130,6 +131,8 @@ public class NodeGenerator : MonoBehaviour
                     cube.transform.localScale = new Vector3(1f, 5f, 1f);
                     BoxCollider cubeCollider = cube.GetComponent<BoxCollider>();
                     cubeCollider.size.Set(1f,5f,1f);
+                    MeshRenderer cubeRenderer = cube.GetComponent<MeshRenderer>();
+                    cubeRenderer.material = mat;
                 }
                 else
                 {
