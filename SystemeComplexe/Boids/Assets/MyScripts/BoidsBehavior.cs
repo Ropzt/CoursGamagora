@@ -28,6 +28,7 @@ public class BoidsBehavior : MonoBehaviour
     CollisionRange colRange;
 
     [SerializeField] private bool hasTarget = true;
+    bool targetOn = true;
     public GameObject target;
 
     // Start is called before the first frame update
@@ -40,6 +41,7 @@ public class BoidsBehavior : MonoBehaviour
         {
             target = GameObject.FindGameObjectWithTag("Target");
         }
+        InvokeRepeating("ChangeState", 5f, 10f);
     }
 
     // Update is called once per frame
@@ -48,7 +50,7 @@ public class BoidsBehavior : MonoBehaviour
         //Reset acceleration
         Vector3 acceleration = Vector3.zero;
 
-        if(hasTarget)
+        if(hasTarget & targetOn)
         {
             Vector3 offsetToTarget = (new Vector3(target.transform.position.x, (target.transform.position.y+Random.Range(-1f,1f)), target.transform.position.z) - mov.position);
             var targetForce = mov.SteerTowards(offsetToTarget) * targetWeight;
@@ -106,4 +108,17 @@ public class BoidsBehavior : MonoBehaviour
         }
         return mov.forward;
     }
+
+    void ChangeState()
+    {
+        if(targetOn)
+        {
+            targetOn = false;
+        }
+        else
+        {
+            targetOn = true;
+        }
+    }
+
 }

@@ -36,7 +36,7 @@ MonoBehaviour:
   m_Name: Movie
   m_EditorClassIdentifier: 
   enabled: 0
-  take: 2
+  take: 3
   captureEveryNthFrame: 1
   fileNameGenerator:
     m_Path:
@@ -44,7 +44,7 @@ MonoBehaviour:
       m_Leaf: Recordings
       m_ForceAssetFolder: 0
       m_AbsolutePath: 
-    m_FileName: boids
+    m_FileName: boids_with_target_obstacle_FSM
   outputFormat: 0
   videoBitRateMode: 2
   captureAlpha: 0
