@@ -16,12 +16,12 @@ public class ZombieBehaviorAstar : MonoBehaviour
     private List<GameObject> path;
     private int pathIndex;
     public bool found = false;
-
+    /*
     private void Start()
     {
         InvokeRepeating("Init", 5f, 300f);
     }
-    /*
+    */
     // Start is called before the first frame update
     void Awake()
     {
@@ -41,9 +41,10 @@ public class ZombieBehaviorAstar : MonoBehaviour
         path = shortPathA.findShortestPath(gameObject, playerObj);
         pathIndex = 0;
         nextNodePosition = path[0].transform.position;
-
+        found = true;
     }
-    */
+    
+    /*
     void Init()
     {
 
@@ -65,7 +66,7 @@ public class ZombieBehaviorAstar : MonoBehaviour
         found = true;
 
     }
-
+    */
     // Update is called once per frame
     void Update()
     {

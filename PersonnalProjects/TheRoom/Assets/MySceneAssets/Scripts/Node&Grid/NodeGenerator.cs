@@ -25,7 +25,7 @@ public class NodeGenerator : MonoBehaviour
         GenerateNeighbours();
 
         GeneratePlayer();
-        //GenerateSpawns();
+        GenerateSpawns();
     }
 
     // Update is called once per frame
@@ -130,6 +130,7 @@ public class NodeGenerator : MonoBehaviour
                     cube.transform.localScale = new Vector3(1f, 5f, 1f);
                     BoxCollider cubeCollider = cube.GetComponent<BoxCollider>();
                     cubeCollider.size.Set(1f,5f,1f);
+                    cube.layer=7;
                 }
                 else
                 {
