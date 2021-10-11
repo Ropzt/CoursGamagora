@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Diagnostics;
 
 namespace WpfApp1
 {
@@ -343,17 +344,14 @@ namespace WpfApp1
 
         void AddObjects()
         {
-            objectList = new List<Object>();
-
-
-            Object sphere1 = new Sphere(1.0, new Vector3D(0, -1, -11), 230, 0, 255, "Mirroir");
-            Object sphere2 = new Sphere(1.0, new Vector3D(1, 1, -11), 255, 0, 0, "Mirroir");
-            Object sphere3 = new Sphere(1.0, new Vector3D(-1, 1, -11), 0, 255, 0, "Mirroir");
-            Object rightFace = new Plane(new Vector3D(2.5, 0, 0), new Vector3D(-1, 0, 0), 0, 255, 0, "Mirroir");
-            Object leftFace = new Plane(new Vector3D(-2.5, 0, 0), new Vector3D(1, 0, 0), 0, 0, 255, "Mirroir");
-            Object topFace = new Plane(new Vector3D(0, -2, 0), new Vector3D(0, 1, 0), 0, 0, 255, "Mirroir");
-            Object bottomFace = new Plane(new Vector3D(0, 2, 0), new Vector3D(0, -1, 0), 255, 0, 0, "Mirroir");
-            Object backFace = new Plane(new Vector3D(0, 0, -16), new Vector3D(0, 0, 1), 255, 255, 255, "Mirroir");
+            Object sphere1 = new Sphere(1.0, new Vector3D(0, -1, -11), 255, 255, 255, "Mirroir");
+            Object sphere2 = new Sphere(1.0, new Vector3D(1, 1, -11), 255, 255, 255, "Mirroir");
+            Object sphere3 = new Sphere(1.0, new Vector3D(-1, 1, -11), 255, 255, 255, "Mirroir");
+            Object rightFace = new Plane(new Vector3D(2.5, 0, 0), new Vector3D(-1, 0, 0), 0, 255, 0);
+            Object leftFace = new Plane(new Vector3D(-2.5, 0, 0), new Vector3D(1, 0, 0), 0, 0, 255);
+            Object topFace = new Plane(new Vector3D(0, -2, 0), new Vector3D(0, 1, 0), 0, 0, 255);
+            Object bottomFace = new Plane(new Vector3D(0, 2, 0), new Vector3D(0, -1, 0), 255, 0, 0);
+            Object backFace = new Plane(new Vector3D(0, 0, -16), new Vector3D(0, 0, 1), 255, 255, 255);
 
 
             objectList.Add(sphere1);
@@ -366,7 +364,9 @@ namespace WpfApp1
             objectList.Add(backFace);
         }
 
-        void colorPixels(Object obj, int index, double eclairageTotal, byte blueReflected, byte greenReflected, byte redReflected)
+
+
+        void colorPixels(ref Object obj, ref int index, ref double eclairageTotal, ref byte blueReflected, ref byte greenReflected, ref byte redReflected)
         {
             //Print
             if (obj.Texture == "Opaque")
@@ -378,15 +378,374 @@ namespace WpfApp1
             }
             else
             {
-
                 pixels[index + 0] = (byte)(eclairageTotal * (blueReflected / 255));
                 pixels[index + 1] = (byte)(eclairageTotal * (greenReflected / 255));
                 pixels[index + 2] = (byte)(eclairageTotal * (redReflected / 255)); //j'aime le violet
                 pixels[index + 3] = 255;
+                Trace.WriteLine("refract");
+                Trace.WriteLine("pix1 = " + pixels[index + 0]);
+                Trace.WriteLine("pix2 = " + pixels[index + 1]);
+                Trace.WriteLine("pix3 = " + pixels[index + 2]);
+                Trace.WriteLine("eclairage = " + eclairageTotal);
+            }
+        }
+
+        void colorPixelsFinal(ref Object obj, ref int index, ref double eclairageTotal, ref byte blueReflected, ref byte greenReflected, ref byte redReflected)
+        {
+            //Print
+            if (obj.Texture == "Opaque")
+            {
+                pixels[index + 0] = (byte)(eclairageTotal * (obj.colorB / 255));
+                pixels[index + 1] = (byte)(eclairageTotal * (obj.colorG / 255));
+                pixels[index + 2] = (byte)(eclairageTotal * (obj.colorR / 255)); //j'aime le violet
+                pixels[index + 3] = 255;
+                
+            }
+            else
+            {
+                pixels[index + 0] = ((byte)(eclairageTotal * (blueReflected / 255)) > pixels[index + 0]) ? pixels[index + 0] : (byte)(eclairageTotal * (blueReflected / 255));
+                pixels[index + 1] = ((byte)(eclairageTotal * (greenReflected / 255)) > pixels[index + 1]) ? pixels[index + 1] : (byte)(eclairageTotal * (greenReflected / 255));
+                pixels[index + 2] = ((byte)(eclairageTotal * (redReflected / 255)) > pixels[index + 2]) ? pixels[index + 2] : (byte)(eclairageTotal * (redReflected / 255));
+
+                pixels[index + 3] = 255;
+
+                Trace.WriteLine("refract Final");
+                Trace.WriteLine("pix1 = " + pixels[index + 0]);
+                Trace.WriteLine("pix2 = " + pixels[index + 1]);
+                Trace.WriteLine("pix3 = " + pixels[index + 2]);
+                Trace.WriteLine("eclairage = " + eclairageTotal);
 
             }
         }
 
+        void ReflectionLoop(Vector3D normalIntersec, Vector3D dir, Vector3D cameraPos, Vector3D pointIntersec, ref double eclairageTotal, ref int index, ref Sphere lightSphere,ref Vector3D intersecOffseted, ref byte blueReflected, ref byte greenReflected, ref byte redReflected, ref int recursionLVL, ref int recursionMax)
+        {
+            double cosineTeta = Vector3D.DotProduct(normalIntersec, dir);
+            //Clamp
+            if (cosineTeta > 1)
+                cosineTeta = 1;
+            if (cosineTeta < -1)
+                cosineTeta = -1;
+            Vector3D b = cosineTeta * normalIntersec;
+            Vector3D reflectionVector = dir - b - b;
+
+            if (!Vector3D.Equals(reflectionVector, new Vector3D()))
+            {
+                //Offset intersection point to prevent acne
+                double x4Reflection = (cameraPos - pointIntersec).X * 0.000001;
+                double y4Reflection = (cameraPos - pointIntersec).Y * 0.000001;
+                double z4Reflection = (cameraPos - pointIntersec).Z * 0.000001;
+                Vector3D intersec4Reflection = pointIntersec + new Vector3D(x4Reflection, y4Reflection, z4Reflection);
+
+                //Ray casted from intersection point
+                Ray rayReflected = new Ray(intersec4Reflection, reflectionVector);
+
+                //Initialize minimal t
+                double intersectMinReflected = double.MaxValue;
+
+                //Check all objects for intersection by the reflection ray
+                foreach (Object objReflected in objectList)
+                {
+                    Sphere sphereReflected = objReflected as Sphere;
+                    Plane planeReflected = objReflected as Plane;
+                    double tReflected = new double();
+                    switch (objReflected.Type)
+                    {
+                        case "Plane":
+                            tReflected = planeReflected.getIntersectT(rayReflected);
+                            break;
+                        case "Sphere":
+                            tReflected = rayReflected.getSphereIntersectT(sphereReflected.Center, sphereReflected.Radius); ;
+                            break;
+                    }
+
+                    //if there's intersection, is the target a mirror or not ? Yes  -> recursion, No -> get colors
+                    if (tReflected != 0 & tReflected < intersectMinReflected)
+                    {
+                        intersectMinReflected = tReflected;
+
+                        //Calculate intersection point & its norm to sphere center
+
+                        Vector3D newIntersec = pointIntersec + (reflectionVector * tReflected);
+
+                        Vector3D newNormalIntersec = new Vector3D();
+                        switch (objReflected.Type)
+                        {
+                            case "Plane":
+                                newNormalIntersec = planeReflected.Normal;
+                                break;
+                            case "Sphere":
+                                newNormalIntersec = newIntersec - sphereReflected.Center;
+                                break;
+                        }
+
+                        newNormalIntersec.Normalize();
+
+                        double x = (lightSphere.Center - newIntersec).X * 0.0001;
+                        double y = (lightSphere.Center - newIntersec).Y * 0.0001;
+                        double z = (lightSphere.Center - newIntersec).Z * 0.0001;
+                        Vector3D newIntersecOffseted = newIntersec + new Vector3D(x, y, z);
+
+                        if ((objReflected.Texture == "Mirroir") & (recursionLVL < recursionMax))
+                        {
+                            
+                            
+
+                            recursionLVL++;
+                            computeLightAndShadows(ref eclairageTotal, ref index, objReflected, ref lightSphere, newIntersec, newNormalIntersec, newIntersecOffseted, ref blueReflected, ref greenReflected, ref redReflected);
+
+                            ReflectionLoop(newNormalIntersec, reflectionVector, cameraPos, newIntersec, ref eclairageTotal, ref index, ref lightSphere, ref intersecOffseted, ref blueReflected, ref greenReflected, ref redReflected, ref recursionLVL, ref recursionMax);
+                        }
+                        else
+                        {
+                            blueReflected = (byte)objReflected.colorB;
+                            greenReflected = (byte)objReflected.colorG;
+                            redReflected = (byte)objReflected.colorR;
+                            computeLightAndShadows(ref eclairageTotal, ref index, objReflected, ref lightSphere, newIntersec, newNormalIntersec, newIntersecOffseted, ref blueReflected, ref greenReflected, ref redReflected);
+
+                        }
+                    }
+                }
+            }
+        }
+
+        void RefractionIn(Object obj, Vector3D normalIntersec, Vector3D dir, Vector3D pointIntersec, Vector3D precedentPoint, ref Sphere lightSphere, ref double eclairageTotal, ref int index, ref byte blueReflected, ref byte greenReflected, ref byte redReflected)
+        {
+            //possible causes of error:
+            // intersectOffseted is offseted in the wrong direction
+            //
+            double cosineTeta = Vector3D.DotProduct(normalIntersec, dir);
+            double refractionIndice = new double();
+            //Clamp
+            if (cosineTeta > 1)
+                cosineTeta = 1;
+            if (cosineTeta < -1)
+                cosineTeta = -1;
+            if (cosineTeta < 0)
+            {
+                cosineTeta = -cosineTeta;
+                refractionIndice = 1 / 1.5; // 1 = air / 1.5 = glass
+            }
+            else
+            {
+                refractionIndice =  1.5 / 1; // 1 = air / 1.5 = glass
+                normalIntersec = -normalIntersec;
+            }
+                
+
+            
+            Vector3D refractionVector = new Vector3D();
+            double k = 1 - refractionIndice * refractionIndice * (1 - cosineTeta * cosineTeta);
+            if (k >= 0)
+                refractionVector = refractionIndice * dir + (refractionIndice * cosineTeta - Math.Sqrt(k)) * normalIntersec;
+
+            Trace.WriteLine("refractionVectorIn = "+refractionVector);
+
+            if (!Vector3D.Equals(refractionVector, new Vector3D()))
+            {
+                double x = (pointIntersec - precedentPoint).X * 0.0001;
+                double y = (pointIntersec - precedentPoint).Y * 0.0001;
+                double z = (pointIntersec - precedentPoint).Z * 0.0001;
+                Vector3D intersecOffseted4Refraction = pointIntersec + new Vector3D(x, y, z);
+
+                Ray insideMatterRay = new Ray(intersecOffseted4Refraction, refractionVector); //maybe need to use intersecOffseted
+                double tRefraction = new double();
+                Plane planeObj = obj as Plane;
+                Sphere sphereObj = obj as Sphere;
+                Vector3D objCenter = new Vector3D();
+                switch (obj.Type)
+                {
+                    case "Plane":
+                        objCenter = planeObj.Center;
+                        tRefraction = planeObj.getIntersectT(insideMatterRay);
+                        break;
+                    case "Sphere":
+                        objCenter = sphereObj.Center;
+                        tRefraction = insideMatterRay.getSphereIntersectT(sphereObj.Center, sphereObj.Radius); 
+                        break;
+                }
+
+                if (tRefraction != 0)
+                {
+                    
+                    Vector3D newIntersecRefraction = pointIntersec + (refractionVector * tRefraction); //maybe intersecOffseted instead of pointIntersec
+
+                    double xNew = (newIntersecRefraction - intersecOffseted4Refraction).X * 0.0001;
+                    double yNew = (newIntersecRefraction - intersecOffseted4Refraction).Y * 0.0001;
+                    double zNew = (newIntersecRefraction - intersecOffseted4Refraction).Z * 0.0001;
+                    Vector3D newIntersecRefractionOffseted = newIntersecRefraction + new Vector3D(xNew, yNew, zNew);
+
+                    Vector3D newNormalIntersecRefraction = new Vector3D();
+                    switch (obj.Type)
+                    {
+                        case "Plane":
+                            newNormalIntersecRefraction = planeObj.Normal;
+                            break;
+                        case "Sphere":
+                            newNormalIntersecRefraction =  newIntersecRefraction - objCenter; //maybe invert
+                            break;
+                    }
+                    newNormalIntersecRefraction.Normalize();
+
+                    RefractionOut(ref obj, newNormalIntersecRefraction, refractionVector, newIntersecRefractionOffseted, intersecOffseted4Refraction, ref lightSphere, ref eclairageTotal, ref index, ref blueReflected, ref greenReflected, ref redReflected);
+                }
+                /*
+                else
+                {
+                    blueReflected = 250;
+                    greenReflected = 250;
+                    redReflected = 250;
+                    eclairageTotal = 253;
+                    colorPixels(ref obj, ref index, ref eclairageTotal, ref blueReflected, ref greenReflected, ref redReflected);
+                }
+                */
+
+            }
+            
+
+        }
+
+
+        void RefractionOut(ref Object obj, Vector3D normalIntersec, Vector3D dir, Vector3D pointIntersecOffseted, Vector3D precedentPos,ref Sphere lightSphere, ref double eclairageTotal, ref int index, ref byte blueReflected, ref byte greenReflected, ref byte redReflected)
+        {
+            
+            double cosineTeta = Vector3D.DotProduct(normalIntersec, dir);
+            double refractionIndice = new double();
+            //Clamp
+            if (cosineTeta > 1)
+                cosineTeta = 1;
+            if (cosineTeta < -1)
+                cosineTeta = -1;
+            if (cosineTeta < 0)
+            {
+                cosineTeta = -cosineTeta;
+                refractionIndice = 1 / 1.5; // 1 = air / 1.5 = glass
+            }
+            else
+            {
+                refractionIndice = 1.5 / 1; // 1 = air / 1.5 = glass
+                normalIntersec = -normalIntersec;
+            }
+
+            
+            Vector3D refractionVector = new Vector3D();
+            double k = 1 - refractionIndice * refractionIndice * (1 - cosineTeta * cosineTeta);
+            if (k >= 0)
+                refractionVector = refractionIndice * dir + (refractionIndice * cosineTeta - Math.Sqrt(k)) * normalIntersec;
+
+            Trace.WriteLine("refractionVectorOut = " + refractionVector);
+
+            if (!Vector3D.Equals(refractionVector, new Vector3D()))
+            {
+                
+                Ray outsideMatterRay = new Ray(pointIntersecOffseted, refractionVector); //maybe need to use intersecOffseted
+                double tRefraction = new double();
+                double tRefractionMin = double.MaxValue;
+
+                foreach (Object objOutMatter in objectList)
+                {
+                    Plane planeOutMatter = objOutMatter as Plane;
+                    Sphere sphereOutMatter = objOutMatter as Sphere;
+                    Vector3D objCenter = new Vector3D();
+                    switch (objOutMatter.Type)
+                    {
+                        case "Plane":
+                            objCenter = planeOutMatter.Center;
+                            tRefraction = planeOutMatter.getIntersectT(outsideMatterRay);
+                            break;
+                        case "Sphere":
+                            objCenter = sphereOutMatter.Center;
+                            tRefraction = outsideMatterRay.getSphereIntersectT(sphereOutMatter.Center, sphereOutMatter.Radius); 
+                            break;
+                    }
+
+                    if (tRefraction != 0 & tRefraction < tRefractionMin)
+                    {
+                        
+                        tRefractionMin = tRefraction;
+                        Vector3D newIntersecRefraction = pointIntersecOffseted + (refractionVector * tRefraction);
+
+                        double x = (pointIntersecOffseted - newIntersecRefraction).X * 0.0001;
+                        double y = (pointIntersecOffseted - newIntersecRefraction).Y * 0.0001;
+                        double z = (pointIntersecOffseted - newIntersecRefraction).Z * 0.0001;
+                        Vector3D newIntersecRefractionOffseted = newIntersecRefraction + new Vector3D(x, y, z);
+
+                        Vector3D newNormalIntersecRefraction = new Vector3D();
+                        switch (objOutMatter.Type)
+                        {
+                            case "Plane":
+                                newNormalIntersecRefraction = planeOutMatter.Normal;
+                                break;
+                            case "Sphere":
+                                newNormalIntersecRefraction =  newIntersecRefraction - objCenter;
+                                break;
+                        }
+
+                        
+                        newNormalIntersecRefraction.Normalize();
+
+                        
+                        blueReflected = (byte)objOutMatter.colorB;
+                        greenReflected = (byte)objOutMatter.colorG;
+                        redReflected = (byte)objOutMatter.colorR;
+                        Trace.WriteLine("blue = " + blueReflected);
+                        Trace.WriteLine("green = " + greenReflected);
+                        Trace.WriteLine("red = " + redReflected);
+                        Trace.WriteLine("eclairage = " + eclairageTotal);
+                        computeLightAndShadows(ref eclairageTotal, ref index, objOutMatter, ref lightSphere, newIntersecRefraction, newNormalIntersecRefraction, newIntersecRefractionOffseted, ref blueReflected, ref greenReflected, ref redReflected);
+                        
+
+                        /*
+                        if (objOutMatter.Texture == "Opaque")
+                        {
+                            Trace.WriteLine("COUCOUUUUUUUUUUUU2");
+                            blueReflected = (byte)objOutMatter.colorB;
+                            greenReflected = (byte)objOutMatter.colorG;
+                            redReflected = (byte)objOutMatter.colorR;
+                            computeLightAndShadows(ref eclairageTotal, ref index, objOutMatter, ref lightSphere, newIntersecRefraction, newNormalIntersecRefraction, newIntersecRefractionOffseted, ref blueReflected, ref greenReflected, ref redReflected);
+
+                        }
+                        else
+                        {
+                           RefractionIn(objOutMatter, newNormalIntersecRefraction, refractionVector, newIntersecRefraction, newIntersecRefractionOffseted, ref lightSphere, ref eclairageTotal, ref index, ref blueReflected, ref greenReflected, ref redReflected); //offseted ??
+                        }
+                        */
+
+
+                    }
+
+                }
+            }
+            
+
+        }
+        double computeTShadowsMax( Ray intersecRay)
+        {
+            double tShadow = 0;
+            double tShadowMax = 0;
+
+            foreach (Object objectObstacle in objectList)
+            {
+                Sphere sphereObstacle = objectObstacle as Sphere;
+                Plane planeObstacle = objectObstacle as Plane;
+                switch (objectObstacle.Type)
+                {
+                    case "Plane":
+                        tShadow = planeObstacle.getIntersectT(intersecRay);
+                        break;
+                    case "Sphere":
+                        tShadow = intersecRay.getSphereIntersectT(sphereObstacle.Center, sphereObstacle.Radius);
+                        break;
+                }
+
+                if (tShadow > tShadowMax)
+                {
+                    tShadowMax = tShadow;
+                }
+            }
+            return tShadowMax;
+        }
+        /*
         double computeTShadowsMax(Object obj, Ray intersecRay)
         {
             double tShadow = 0;
@@ -413,13 +772,86 @@ namespace WpfApp1
             }
             return tShadowMax;
         }
-
-        void computeLightAndShadows(int index, Object obj, Sphere lightSphere, Vector3D pointIntersec, Vector3D normalIntersec, Vector3D intersecOffseted, byte blueReflected, byte greenReflected, byte redReflected)
+        */
+        void computeLightAndShadows(ref double eclairageTotal, ref int index, Object obj, ref Sphere lightSphere, Vector3D pointIntersec, Vector3D normalIntersec, Vector3D intersecOffseted, ref byte blueReflected, ref byte greenReflected, ref byte redReflected)
         {
             /*
              Loop multiple ray for spherical lightSource to get diffuse shadows
             */
-            double eclairageTotal = new double();
+            
+            //Trace ray from intersection point and search for light source or obstacles
+            int nb_meridiens = 20;
+            int nb_paralleles = 20;
+            int nb_rays2Light = nb_meridiens * nb_paralleles;
+            double decalage = Vector3D.DotProduct(normalIntersec, new Vector3D(0, 0, 1));
+            double decalageInv = Math.Acos(decalage);
+
+            for (int j = 0; j < nb_paralleles; j++)
+            {
+                double phi = ((Math.PI * j) / nb_paralleles);
+                for (int i = 0; i < nb_meridiens; i++)
+                {
+                    double angle = ((2 * Math.PI * i) / nb_meridiens);
+
+
+                    double xDir = Math.Cos(angle + decalageInv) * Math.Sin(phi);
+                    double yDir = Math.Sin(angle + decalageInv) * Math.Sin(phi);
+                    double zDir = Math.Cos(phi);
+                    Vector3D rayMarker = new Vector3D(xDir, yDir, zDir);
+
+                    //Calculate direction vector from intersect to light.Center
+                    Vector3D directorVector = rayMarker - pointIntersec;
+                    directorVector.Normalize();
+                    Ray intersecRay = new Ray(pointIntersec, directorVector);
+                    double tLight = intersecRay.getSphereIntersectT(lightSphere.Center, lightSphere.Radius);
+
+                    if (tLight != 0)
+                    {
+                        double tShadowMax = computeTShadowsMax(intersecRay);
+                        Trace.WriteLine("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" );
+                        if (tShadowMax == 0)
+                        {
+                            //compute the quantity of light given an intensity
+                            double intensity = 7500 / nb_rays2Light;
+                            //double eclairage = Vector3D.DotProduct(normalIntersec, directorVector) * (intensity / tLight);
+                            Vector3D intersecOnLight = pointIntersec + (directorVector*tLight);
+                            double distance = Math.Pow((intersecOnLight.X - pointIntersec.X ), 2f) + Math.Pow((intersecOnLight.Y - pointIntersec.Y), 2f) + Math.Pow((intersecOnLight.Z - pointIntersec.Z), 2f);
+                            double eclairage = Vector3D.DotProduct(normalIntersec, directorVector) * (intensity / distance);
+                            eclairageTotal += eclairage;
+                            Trace.WriteLine("eclairage added = " + eclairage);
+                            //Clamp
+                            if (eclairageTotal < 0)
+                            {
+                                eclairageTotal = 0;
+                            }
+                            if (eclairageTotal > 255)
+                            {
+                                eclairageTotal = 255;
+                            }
+                        }
+                        colorPixels(ref obj, ref index, ref eclairageTotal, ref blueReflected, ref greenReflected, ref redReflected);
+                    }
+                    else
+                    {
+                        Trace.WriteLine("tLight down");
+                        //Print
+                        pixels[index + 0] = 0;
+                        pixels[index + 1] = 0;
+                        pixels[index + 2] = 0;
+                        pixels[index + 3] = 255;
+                    }
+
+
+                }
+            }
+        }
+
+        void computeLightAndShadowsFinal(ref double eclairageTotal, ref int index, Object obj, ref Sphere lightSphere, Vector3D pointIntersec, Vector3D normalIntersec, Vector3D intersecOffseted, ref byte blueReflected, ref byte greenReflected, ref byte redReflected)
+        {
+            /*
+             Loop multiple ray for spherical lightSource to get diffuse shadows
+            */
+
             //Trace ray from intersection point and search for light source or obstacles
             int nb_meridiens = 20;
             int nb_paralleles = 20;
@@ -448,13 +880,16 @@ namespace WpfApp1
 
                     if (tLight != 0)
                     {
-                        double tShadowMax = computeTShadowsMax(obj, intersecRay);
+                        double tShadowMax = computeTShadowsMax(intersecRay);
 
                         if (tShadowMax == 0)
                         {
                             //compute the quantity of light given an intensity
-                            double intensity = 750 / nb_rays2Light;
-                            double eclairage = Vector3D.DotProduct(normalIntersec, directorVector) * (intensity / tLight);
+                            double intensity = 7500 / nb_rays2Light;
+                            //double eclairage = Vector3D.DotProduct(normalIntersec, directorVector) * (intensity / tLight);
+                            Vector3D intersecOnLight = pointIntersec + (directorVector * tLight);
+                            double distance = Math.Pow((intersecOnLight.X - pointIntersec.X), 2f) + Math.Pow((intersecOnLight.Y - pointIntersec.Y), 2f) + Math.Pow((intersecOnLight.Z - pointIntersec.Z), 2f);
+                            double eclairage = Vector3D.DotProduct(normalIntersec, directorVector) * (intensity / distance);
                             eclairageTotal += eclairage;
 
                             //Clamp
@@ -467,7 +902,7 @@ namespace WpfApp1
                                 eclairageTotal = 255;
                             }
                         }
-                        colorPixels(obj, index, eclairageTotal, blueReflected, greenReflected, redReflected);
+                        colorPixelsFinal(ref obj, ref index, ref eclairageTotal, ref blueReflected, ref greenReflected, ref redReflected);
                     }
                     else
                     {
@@ -487,11 +922,13 @@ namespace WpfApp1
         void Render()
         {
             InitializeBackground();
-
+            objectList = new List<Object>();
             AddObjects();
-            
-
             Vector3D cameraPos = new Vector3D(0,0,6);
+
+            Sphere lightSphere = new Sphere(2.0, new Vector3D(0, 0, -7), 255, 255, 255);
+
+            Trace.WriteLine("COUCOU");
 
             int seed = 1312;
             Random rand = new Random(seed);
@@ -507,10 +944,9 @@ namespace WpfApp1
                     dir.Normalize();
 
                     Ray ray = new Ray(cameraPos, dir);
-                    int sphereCount = 0;
                     double intersectMin = double.MaxValue;
 
-                    //foreach (Sphere sphere in sphereList)
+                    
                     foreach(Object obj in objectList)
                     {
                         Sphere sphereObj = obj as Sphere;
@@ -540,40 +976,20 @@ namespace WpfApp1
                                     normalIntersec =  planeObj.Normal;
                                     break;
                                 case "Sphere":
-                                    sphereObj = obj as Sphere;
                                     normalIntersec = pointIntersec - sphereObj.Center;
                                     break;
                             }
                             
                             normalIntersec.Normalize();
 
-
-
+                            //Initialize Recursion LVL for mirrors and transparent objects
+                            int recursionLVL = 1;
+                            int recursionMax = 4;
 
                             /*
                              REFRACTION / REFLECTION
                             */
 
-                            double cosineTeta = Vector3D.DotProduct(normalIntersec, dir);
-                            //Clamp
-                            if (cosineTeta > 1)
-                                cosineTeta = 1;
-                            if (cosineTeta < -1)
-                                cosineTeta = -1;
-                            /* Inverse l'image, a comprendre
-                            if (cosineTeta < 0)
-                                cosineTeta = -cosineTeta;
-                            */
-                            //Reflection
-                            Vector3D b = cosineTeta * normalIntersec;
-                            Vector3D reflectionVector = dir - b - b;
-
-                            //Refraction
-                            double refractionIndice = 1/1.5; // 1 = air / 1.5 = glass
-                            Vector3D refractionVector = new Vector3D();
-                            double k = 1 - refractionIndice * refractionIndice * (1 - cosineTeta * cosineTeta);
-                            if (k >= 0)
-                                refractionVector =  refractionIndice * dir + (refractionIndice * cosineTeta - Math.Sqrt(k)) * normalIntersec;
                             /*TODO : 
                              * Aleatoirement choisir entre refraction et reflection (sauf si un =0)
                              * if Refraction -> Loop l'aléatoire
@@ -588,44 +1004,21 @@ namespace WpfApp1
                             byte greenReflected = 0;
                             byte redReflected = 0;
 
+                            double x = (lightSphere.Center - pointIntersec).X * 0.0001;
+                            double y = (lightSphere.Center - pointIntersec).Y * 0.0001;
+                            double z = (lightSphere.Center - pointIntersec).Z * 0.0001;
+                            Vector3D intersecOffseted = pointIntersec + new Vector3D(x, y, z);
+
+                            double eclairageTotal = new double();
+
                             if (obj.Texture == "Mirroir")
                             {
-                                if (!Vector3D.Equals(reflectionVector, new Vector3D()))
-                                {
-                                    double x4Reflection = (cameraPos - pointIntersec).X * 0.000001;
-                                    double y4Reflection = (cameraPos - pointIntersec).Y * 0.000001;
-                                    double z4Reflection = (cameraPos - pointIntersec).Z * 0.000001;
-                                    Vector3D intersec4Reflection = pointIntersec + new Vector3D(x4Reflection, y4Reflection, z4Reflection);
+                                //ReflectionLoop(normalIntersec, dir, cameraPos, pointIntersec, ref eclairageTotal, ref index, ref lightSphere, ref intersecOffseted, ref blueReflected, ref greenReflected, ref redReflected, ref recursionLVL, ref recursionMax);
+                                RefractionIn(obj, normalIntersec, dir, pointIntersec, cameraPos, ref lightSphere, ref eclairageTotal, ref index, ref blueReflected, ref greenReflected, ref redReflected); //offseted ??
 
-                                    Ray rayReflected = new Ray(intersec4Reflection, reflectionVector);
-                                    double intersectMinReflected = double.MaxValue;
-                                    foreach (Object objReflected in objectList)
-                                    {
-                                        Sphere sphereReflected = objReflected as Sphere;
-                                        Plane planeReflected = objReflected as Plane;
-                                        double tReflected = new double();
-                                        switch (objReflected.Type)
-                                        {
-                                            case "Plane":
-                                                tReflected = planeReflected.getIntersectT(rayReflected);
-                                                break;
-                                            case "Sphere":
-                                                tReflected = rayReflected.getSphereIntersectT(sphereReflected.Center, sphereReflected.Radius); ;
-                                                break;
-                                        }
-
-                                        if (tReflected != 0 & tReflected < intersectMinReflected)
-                                        {
-                                            intersectMinReflected = tReflected;
-                                            blueReflected  = (byte)objReflected.colorB;
-                                            greenReflected = (byte)objReflected.colorG;
-                                            redReflected   = (byte)objReflected.colorR;
-                                        }
-                                    }
-                                }
                             }
 
-                            
+
                             /*
                             if (Vector3D.Equals(refractionVector, new Vector3D()) & !Vector3D.Equals(reflectionVector, new Vector3D()) )
                             {
@@ -653,18 +1046,9 @@ namespace WpfApp1
                                 ECLAIRAGE
                             */
 
-                            
-                            
-                            Sphere lightSphere = new Sphere(2.0, new Vector3D(0, 0, -7), 255, 255, 255);
-                            double x = (lightSphere.Center - pointIntersec).X * 0.0001;
-                            double y = (lightSphere.Center - pointIntersec).Y * 0.0001;
-                            double z = (lightSphere.Center - pointIntersec).Z * 0.0001;
-                            Vector3D intersecOffseted = pointIntersec + new Vector3D(x, y, z);
-
-                            computeLightAndShadows(index, obj, lightSphere, pointIntersec, normalIntersec, intersecOffseted, blueReflected, greenReflected, redReflected);
+                            computeLightAndShadowsFinal(ref eclairageTotal, ref index, obj, ref lightSphere, pointIntersec, normalIntersec, intersecOffseted, ref blueReflected, ref greenReflected, ref redReflected);
                             
                         }
-                        sphereCount++;
                     }
                 }
             }
