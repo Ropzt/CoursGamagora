@@ -54,6 +54,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Assets\MaillageLoader.cs" />
+    <Compile Include="Assets\ChaikinSubdivision.cs" />
+    <Compile Include="Assets\Bezier.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

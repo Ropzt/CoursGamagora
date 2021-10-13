@@ -40,21 +40,20 @@ public class MaillageLoader : MonoBehaviour
         replaceTriangles();
         removeUselessTriangles();
 
+
+        Debug.Log("Nombre Original de vertices = " + nb_vertices);
+        Debug.Log("Nombre Original de triangles = " + nb_faces);
+        Debug.Log("Nombre de triangles = " + (simplifiedTriangles.Count/3));
+
         msh.vertices = verticesList;
         msh.triangles = simplifiedTriangles.ToArray();
         gameObject.GetComponent<MeshFilter>().mesh = msh;
         gameObject.GetComponent<MeshRenderer>().material = mat;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     void ImportOFF()
     {
-        string[] lines = File.ReadAllLines(@"Assets/buddha.off");
+        string[] lines = File.ReadAllLines(@"Assets/triceratops.off");
 
         //Line 1 
         string[] line1Split = lines[1].Split(' ');
@@ -146,14 +145,14 @@ public class MaillageLoader : MonoBehaviour
     {
         
         int index = 0;
-        int gridSize = (int)Math.Pow(((2.2f+pas)/pas),3f);
+        int gridSize = (int)Math.Pow(((2f+(3*pas))/pas),3f);
         grid = new grid4Clustering[gridSize+1];
 
-        for(float x = (gravityCenter.x-1.1f); x< (gravityCenter.x + 1.1f); x+=pas)
+        for(float x = (gravityCenter.x-1f-pas); x< (gravityCenter.x + 1f + pas); x+=pas)
         {
-            for (float y = (gravityCenter.y - 1.1f); y < (gravityCenter.y + 1.1f); y += pas)
+            for (float y = (gravityCenter.y - 1f - pas); y < (gravityCenter.y + 1f + pas); y += pas)
             {
-                for (float z = (gravityCenter.z - 1.1f); z < (gravityCenter.z + 1.1f); z += pas)
+                for (float z = (gravityCenter.z - 1f - pas); z < (gravityCenter.z + 1f + pas); z += pas)
                 {
                     grid[index].cellCenter = new Vector3(x, y, z);
                     grid[index].verticesInCell = new List<int>();
@@ -217,7 +216,7 @@ public class MaillageLoader : MonoBehaviour
         simplifiedTriangles = new List<int>();
         for (int i = 0; i < nb_aretes; i+=3)
         {
-            if(  (triangleList[i] != triangleList[i+1]) & (triangleList[i] != triangleList[i + 2]) & (triangleList[i+2] != triangleList[i + 1]))
+            if( (triangleList[i] != triangleList[i+1]) & (triangleList[i] != triangleList[i + 2]) & (triangleList[i+2] != triangleList[i + 1]))
             {
                 simplifiedTriangles.Add(triangleList[i]);
                 simplifiedTriangles.Add(triangleList[i+1]);

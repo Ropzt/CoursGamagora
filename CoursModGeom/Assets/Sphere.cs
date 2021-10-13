@@ -80,22 +80,26 @@ public class Sphere : MonoBehaviour
             {
                 if((i+1) == nb_meridiens)
                 {
+                    outerTriangle.Add((j * nb_meridiens));
                     outerTriangle.Add((j*nb_meridiens)+i);
-                    outerTriangle.Add((j*nb_meridiens));
+                    //outerTriangle.Add((j*nb_meridiens));
                     outerTriangle.Add(((j+1)*nb_meridiens));
 
+                    outerTriangle.Add(((j + 1) * nb_meridiens));
                     outerTriangle.Add((j*nb_meridiens)+i);
-                    outerTriangle.Add(((j+1)*nb_meridiens));
+                    //outerTriangle.Add(((j+1)*nb_meridiens));
                     outerTriangle.Add(((j+1)*nb_meridiens)+i);
                 }
                 else
                 {
+                    outerTriangle.Add((j * nb_meridiens) + i + 1);
                     outerTriangle.Add((j*nb_meridiens)+i);
-                    outerTriangle.Add((j*nb_meridiens)+i+1);
+                    //outerTriangle.Add((j*nb_meridiens)+i+1);
                     outerTriangle.Add(((j+1)*nb_meridiens)+i+1);
 
+                    outerTriangle.Add(((j + 1) * nb_meridiens) + i + 1);
                     outerTriangle.Add((j*nb_meridiens)+i);
-                    outerTriangle.Add(((j+1)*nb_meridiens)+i+1);
+                    //outerTriangle.Add(((j+1)*nb_meridiens)+i+1);
                     outerTriangle.Add(((j+1)*nb_meridiens)+i);
                 }
             }
@@ -104,17 +108,22 @@ public class Sphere : MonoBehaviour
         //dernier cercle vers pole 2
         for(int i =0; i<nb_meridiens;i++)
         {
-            outerTriangle.Add(((nb_paralleles-1)*nb_meridiens)+i);
+            
 
             if((i+1) == nb_meridiens)
             {
-                    outerTriangle.Add(((nb_paralleles-1)*nb_meridiens));
+                //outerTriangle.Add(((nb_paralleles - 1) * nb_meridiens) + i + 1);
+                outerTriangle.Add(((nb_paralleles-1)*nb_meridiens));
             }
             else
             {
-                    outerTriangle.Add(((nb_paralleles-1)*nb_meridiens)+i+1);
+                outerTriangle.Add(((nb_paralleles-1)*nb_meridiens)+i+1);
+                //outerTriangle.Add(((nb_paralleles - 1) * nb_meridiens));
             }
-            if(isSphere & !isCone)
+
+            outerTriangle.Add(((nb_paralleles - 1) * nb_meridiens) + i);
+
+            if (isSphere & !isCone)
             {
                 outerTriangle.Add(nb_vertices+1);
             }
