@@ -1,49 +1,66 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Threading;
 
 public class ZombieBehaviorAstar : MonoBehaviour
 {
     
-    private AstarPathfinding shortPathA;
+    private GridNode4Threading shortPathA;
     private Movement mov;
-    private GameObject playerObj;
     private NodeGenerator grid;
     private Node noeud;
+    private Genome genome;
+
+    private GameObject playerObj;
+    private PlayerController playerCtrl;
+    
+    [HideInInspector] public List<Vector3> path;
 
     [SerializeField] private float steerWeight = 10f;
+    [SerializeField] private float health;
+    [SerializeField] private float attack;
+    [SerializeField] private float range;
+    private bool isAttacking = false;
+
     private Vector3 nextNodePosition;
-    private List<GameObject> path;
     private int pathIndex;
-    public bool found = false;
+    public bool isPathReady = false;
+
+    public delegate void DieDelegate();
+    public event DieDelegate dieEvent;
+
     /*
     private void Start()
     {
         InvokeRepeating("Init", 5f, 300f);
     }
     */
+
     // Start is called before the first frame update
     void Awake()
     {
-
+        Debug.Log("Un ennemi apparait");
         grid = GameObject.FindGameObjectWithTag("Grid").GetComponent<NodeGenerator>();
-        shortPathA = GetComponent<AstarPathfinding>();
+        playerObj = GameObject.FindGameObjectWithTag("Player");
+        playerCtrl = playerObj.GetComponent<PlayerController>();
+        shortPathA = GetComponent<GridNode4Threading>();
         mov = GetComponent<Movement>();
         noeud = GetComponent<Node>();
         noeud.setZombie(true);
 
-        LinkToNearNeighbours();
+        //LinkToNearNeighbours();
 
-        playerObj = GameObject.FindGameObjectWithTag("Player");
+        //Awake genome and retrieve values
+        genome = GetComponent<Genome>();
+        genome.Init();
+        health = genome.geneVector.x;
+        attack = genome.geneVector.z;
 
-        
-        // Run A*
-        path = shortPathA.findShortestPath(gameObject, playerObj);
         pathIndex = 0;
-        nextNodePosition = path[0].transform.position;
-        found = true;
+        shortPathA.Init();
     }
-    
+
     /*
     void Init()
     {
@@ -70,7 +87,7 @@ public class ZombieBehaviorAstar : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(found)
+        if(isPathReady)
         {
             Vector3 nearestNodePosition = getNearestNode();
             float distanceToNextNode = Vector3.Distance(nearestNodePosition, nextNodePosition);
@@ -79,11 +96,12 @@ public class ZombieBehaviorAstar : MonoBehaviour
                 if ((pathIndex + 1) < path.Count)
                 {
                     pathIndex++;
-                    nextNodePosition = path[pathIndex].transform.position;
+                    nextNodePosition = path[pathIndex];
                 }
-                else
+                else if (!isAttacking)
                 {
                     Attack();
+                    StartCoroutine(Attackdelay());
                 }
             }
             else
@@ -119,7 +137,6 @@ public class ZombieBehaviorAstar : MonoBehaviour
         //Link to nearest node's neighbours
         foreach (GameObject neighbour in nearestNodeNode.getNeighbourNode())
         {
-
             Node neighbourNode = neighbour.GetComponent<Node>();
             if (!neighbourNode.isZombie())
             {
@@ -136,16 +153,58 @@ public class ZombieBehaviorAstar : MonoBehaviour
         return nearestNodePosition;
     }
 
-    void Attack()
+    public int getNearestNodeIndex()
     {
-
+        //Find nearest node
+        Vector3 nearestNodePosition = getNearestNode();
+        int nearestNodeIndex = (int)(((nearestNodePosition.z + grid.zMax) * ((grid.xMax * 2) + 1)) + (nearestNodePosition.x + grid.xMax));
+        return nearestNodeIndex;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    public void InitPath(List<Vector3> pathCompleted)
     {
-        if (collision.gameObject.tag == "Projectile")
-        {
+        path = pathCompleted;
+        nextNodePosition = path[0];
+        isPathReady = true;
+    }
 
+    void Attack()
+    {
+        isAttacking = true;
+        //if distance to endNode < X, then start coroutine Attack : reduce health of player by K and then wait for T seconds before repeating, if not dead while waiting
+        RaycastHit hit;
+        Vector3 direction = playerObj.transform.position - transform.position;
+        if (Physics.Raycast(transform.position, direction, out hit, range))
+        {
+            if(hit.transform.tag == "Player")
+            {
+                Debug.Log("ENEMY ATTACK");
+                playerCtrl.TakeDamage(attack);
+                genome.damageDone += attack;
+            }
+        }
+    }
+
+    IEnumerator Attackdelay()
+    {
+        yield return new WaitForSecondsRealtime(10f);
+        isAttacking = false;
+    }
+
+    public void TakeDamage(float damageTaken)
+    {
+        health -= damageTaken;
+        if(health<0)
+        {
+            //Send data to gene manager
+            genome.SendGenomeData();
+
+            if(dieEvent != null)
+            {
+                dieEvent();
+            }
+
+            //Die
             foreach (GameObject neighbour in noeud.getNeighbourNode())
             {
                 Node neighbourNode = neighbour.GetComponent<Node>();

@@ -15,21 +15,20 @@ public class Bezier : MonoBehaviour
 
     [SerializeField] private float pas;
     [SerializeField] private float width;
-    [SerializeField] private Vector3 _point0;
-    [SerializeField] private Vector3 _point1;
-    [SerializeField] private Vector3 _point2;
-    [SerializeField] private Vector3 _point3;
+    [SerializeField] private Vector3 _point0 = new Vector3(-1f, 0f, 0f);
+    [SerializeField] private Vector3 _point1 = new Vector3(-1f, 1f, 0f);
+    [SerializeField] private Vector3 _point2 = new Vector3( 1f, 1f, 0f);
+    [SerializeField] private Vector3 _point3 = new Vector3( 1f, 0f, 0f);
 
     // Start is called before the first frame update
     void Start()
     {
-        ResetPoints();
-        GenerateCurve();
+        InitPoints();
     }
 
     
 
-    public void ResetList()
+    public void InitPoints()
     {
         verticesList = new List<Vector3>();
 
@@ -39,37 +38,33 @@ public class Bezier : MonoBehaviour
         verticesList.Add(_point3);
     }
 
-    public void GenerateCubes()
+
+    public void ChangePointPos(int index, Vector3 newPos)
     {
-        for( int i =0; i< verticesList.Count; i++)
-        {
-           GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-           cube.transform.position = verticesList[i];
-           cube.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-           cube.transform.parent = gameObject.transform;
-        }
-        
+        verticesList[index] = newPos;
     }
 
-    public void ResetPoints()
+    public void AddPoint(Vector3 point2Add)
     {
-        ResetList();
-        GenerateCubes();
+        Vector3 controlPoint1 = verticesList[verticesList.Count-1] + (verticesList[verticesList.Count - 1]- verticesList[verticesList.Count - 2]);
+        Vector3 controlPoint2 = new Vector3(point2Add.x + (verticesList[verticesList.Count - 1].x - verticesList[verticesList.Count - 2].x),
+                                            point2Add.y + (verticesList[verticesList.Count - 1].y - verticesList[verticesList.Count - 2].y),
+                                            point2Add.z + (verticesList[verticesList.Count - 1].z - verticesList[verticesList.Count - 2].z));
+        //Add control point attached to the last point in list
+        verticesList.Add(controlPoint1);
+        //Add control point attached to the point to add
+        verticesList.Add(controlPoint2);
+        //Add the new point
+        verticesList.Add(point2Add);
     }
+
 
     public void GenerateCurve()
     {
         //QuadraticCurve(verticesList[0], verticesList[1], verticesList[2]);
         //CubicCurveDeCasteljau(verticesList[0], verticesList[1], verticesList[2], verticesList[3]);
-        CubicCurveBernstein(verticesList[0], verticesList[1], verticesList[2], verticesList[3]);
-
-        toComputeCurve.Add(verticesList[verticesList.Count - 1]);
-
-        gameObject.AddComponent<LineRenderer>();
-        gameObject.GetComponent<LineRenderer>().positionCount = toComputeCurve.Count;
-        gameObject.GetComponent<LineRenderer>().startWidth = width;
-        gameObject.GetComponent<LineRenderer>().endWidth = width;
-        gameObject.GetComponent<LineRenderer>().SetPositions(toComputeCurve.ToArray());
+        //CubicCurveBernstein(verticesList[0], verticesList[1], verticesList[2], verticesList[3]);
+        CubicCurveBernsteinAnyLength();
     }
 
     /*
@@ -188,6 +183,55 @@ public class Bezier : MonoBehaviour
         toComputeCurve = cubicCurveList;
     }
 
+    void CubicCurveBernsteinAnyLength()
+    {
+        /*
+         * Calculate all the points following a Bézier curve, using Bernstein's Polynomials.
+         */
+
+        //Reset
+        cubicCurveList = new List<Vector3>();
+
+        for (int i = 0; i<(verticesList.Count-1); i+=3)
+        {
+            Vector3 p0 = verticesList[i];
+            Vector3 p1 = verticesList[i+1];
+            Vector3 p2 = verticesList[i+2];
+            Vector3 p3 = verticesList[i+3];
+
+            for (float t = 0f; t <= 1f; t += pas)
+            {
+                //Init
+                Vector3 cubicPoint = new Vector3();
+
+                //Bernstein's Polynomials
+                float p0Weight = -Mathf.Pow(t, 3f) + (3 * Mathf.Pow(t, 2f)) - 3 * t + 1;
+                float p1Weight = 3 * Mathf.Pow(t, 3f) - 6 * Mathf.Pow(t, 2f) + 3 * t;
+                float p2Weight = -3 * Mathf.Pow(t, 3f) + 3 * Mathf.Pow(t, 2f);
+                float p3Weight = Mathf.Pow(t, 3f);
+
+                // TODO MAYBE: Check if the sum of the weights == 1f, else throw error
+                // TODO : Get Normals
+                
+                //Compute Tangent, no use for now but yeah it's cool
+                //Vector3 tangent = getTangent(p0, p1, p2, p3, t);
+
+                //Compute
+                cubicPoint.x = (p0.x * (p0Weight)) + (p1.x * (p1Weight)) + (p2.x * (p2Weight)) + (p3.x * (p3Weight));
+                cubicPoint.y = (p0.y * (p0Weight)) + (p1.y * (p1Weight)) + (p2.y * (p2Weight)) + (p3.y * (p3Weight));
+                cubicPoint.z = (p0.z * (p0Weight)) + (p1.z * (p1Weight)) + (p2.z * (p2Weight)) + (p3.z * (p3Weight));
+
+                //Add to list
+                cubicCurveList.Add(cubicPoint);
+            }
+        }
+        //Send to master list
+        toComputeCurve = cubicCurveList;
+
+        //Add The Forgotten Onne
+        toComputeCurve.Add(verticesList[verticesList.Count - 1]);
+    }
+
     Vector3 getTangent(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t)
     {
         /*
@@ -212,4 +256,6 @@ public class Bezier : MonoBehaviour
 
         return tangent;
     }
+
+    
 }

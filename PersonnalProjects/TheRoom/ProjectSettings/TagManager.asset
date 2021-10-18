@@ -8,6 +8,7 @@ TagManager:
   - Grid
   - Enemy
   - Boid
+  - GeneManager
   layers:
   - Default
   - TransparentFX
@@ -19,7 +20,7 @@ TagManager:
   - Obstacle
   - PostProcessing
   - Not in Reflection
-  - 
+  - Enemy
   - 
   - 
   - 

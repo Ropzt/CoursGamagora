@@ -91,8 +91,10 @@ MonoBehaviour:
   position: {x: 0, y: 0, z: 0}
   parentNode: {fileID: 0}
   neighbourNode: []
+  neighbourNodeIndex: 
   walkable: 1
   zombie: 0
+  player: 0
 --- !u!114 &1613956424245604840
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -105,6 +107,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e1046080def2b8429d2590ccb8a59d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  health: 1000
+  range: 100
+  attack: 100
 --- !u!1 &5346597949067531215
 GameObject:
   m_ObjectHideFlags: 0
@@ -120,7 +125,7 @@ GameObject:
   - component: {fileID: 5346597949067531217}
   m_Layer: 0
   m_Name: Camera
-  m_TagString: Untagged
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -135,7 +140,8 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 2170373765520479814}
   m_Father: {fileID: 5346597948088358582}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -318,3 +324,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mouseSensitivity: 300
   playerBody: {fileID: 5346597948088358582}
+--- !u!1 &7734109786156957114
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2170373765520479814}
+  m_Layer: 0
+  m_Name: Gun
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2170373765520479814
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7734109786156957114}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 5346597949067531216}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

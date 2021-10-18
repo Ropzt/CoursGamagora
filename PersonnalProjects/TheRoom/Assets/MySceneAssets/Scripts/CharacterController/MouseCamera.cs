@@ -14,10 +14,18 @@ public class MouseCamera : MonoBehaviour
 
     float xRotation = 0f;
 
+    InputAction shoot;
+
+    PlayerController playerController;
+
     // Start is called before the first frame update
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+
+        playerController = transform.parent.GetComponent<PlayerController>();
+        shoot = new InputAction("Shoot", binding: "<Mouse>/leftButton");
+        shoot.Enable();
     }
 
     // Update is called once per frame
@@ -42,6 +50,7 @@ public class MouseCamera : MonoBehaviour
         mouseX *= mouseSensitivity * Time.deltaTime;
         mouseY *= mouseSensitivity * Time.deltaTime;
 #else
+        
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 #endif
@@ -52,6 +61,13 @@ public class MouseCamera : MonoBehaviour
         transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
 
         playerBody.Rotate(Vector3.up * mouseX);
+
+        bool shootPressed = false;
+        shootPressed = Mathf.Approximately(shoot.ReadValue<float>(), 1);
+        if(shootPressed)
+        {
+            playerController.Shoot();
+        }
     }
 }
 

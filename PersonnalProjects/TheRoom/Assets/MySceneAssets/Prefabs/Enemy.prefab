@@ -16,6 +16,8 @@ GameObject:
   - component: {fileID: 6873015008624514721}
   - component: {fileID: 6873015008624514735}
   - component: {fileID: 6873015008624514720}
+  - component: {fileID: 1238287446619276992}
+  - component: {fileID: 8593171599492221855}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
@@ -128,6 +130,7 @@ MonoBehaviour:
   position: {x: 0, y: 0, z: 0}
   parentNode: {fileID: 0}
   neighbourNode: []
+  neighbourNodeIndex: 
   walkable: 1
   zombie: 0
   player: 0
@@ -143,8 +146,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d99c76d2f1557024490e215467def31a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  path: []
   steerWeight: 10
-  found: 0
+  health: 100
+  attack: 50
+  range: 50
+  isPathReady: 0
 --- !u!114 &6873015008624514720
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -163,3 +170,30 @@ MonoBehaviour:
   position: {x: 0, y: 0, z: 0}
   forward: {x: 0, y: 0, z: 0}
   cachedTransform: {fileID: 0}
+--- !u!114 &1238287446619276992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6873015008624514722}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bdb82a98bde54546830ec04b5ecbd22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  geneVector: {x: 0, y: 0, z: 0}
+  damageDone: 0
+  mutationOffset: 0.1
+--- !u!114 &8593171599492221855
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6873015008624514722}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8de5f63e73ce67841987308cbe80521c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

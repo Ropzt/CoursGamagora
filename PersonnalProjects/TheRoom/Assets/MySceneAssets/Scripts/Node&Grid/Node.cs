@@ -9,6 +9,7 @@ public class Node : MonoBehaviour {
     [SerializeField] private Vector3 position = new Vector3();
     [SerializeField] private GameObject parentNode = null;
     [SerializeField] private List<GameObject> neighbourNode;
+    [SerializeField] private List<int> neighbourNodeIndex;
     [SerializeField] private bool walkable = true;
     [SerializeField] private bool zombie = false;
     [SerializeField] private bool player = false;
@@ -87,9 +88,15 @@ public class Node : MonoBehaviour {
         this.neighbourNode.Add(node);
     }
 
+    /// Adding neighbour node object.
+    public void addNeighbourNodeIndex(int neighbourIndex)
+    {
+        this.neighbourNodeIndex.Add(neighbourIndex);
+    }
+
     // Getters
 
-    
+
     /// Get neighbour node.
     public List<GameObject> getNeighbourNode()
     {
@@ -97,7 +104,13 @@ public class Node : MonoBehaviour {
         return result;
     }
 
-    
+    /// Get neighbour node index.
+    public List<int> getNeighbourNodesIndex()
+    {
+        List<int> result = this.neighbourNodeIndex;
+        return result;
+    }
+
     /// Get weight
     public float getWeight()
     {

@@ -7,15 +7,15 @@ public class NodeGenerator : MonoBehaviour
     [SerializeField] private GameObject nodePrefab;
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private GameObject spawnManagerPrefab;
+    [SerializeField] private int nb_Spawn = 3;
+
     public float xMax;
     public float zMax;
     public List<GameObject> nodeList;
-    [SerializeField] private int nb_Spawn = 3;
-
-    // Start is called before the first frame update
+    public GridNodeData[] gridNodeData;
+    
     void Start()
     {
-        
         Transform groundTrans = GameObject.FindGameObjectWithTag("Ground").GetComponent<Transform>();
         xMax = (groundTrans.localScale.x)*5f;
         zMax = (groundTrans.localScale.z)*5f;
@@ -23,15 +23,33 @@ public class NodeGenerator : MonoBehaviour
 
         GenerateNodeGrid();
         GenerateNeighbours();
+        GenerateNodeData();
 
         GeneratePlayer();
         GenerateSpawns();
     }
 
-    // Update is called once per frame
-    void Update()
+    void GenerateNodeData()
     {
-        
+        gridNodeData = new GridNodeData[nodeList.Count];
+
+        for (int i = 0; i < nodeList.Count; i++)
+        {
+            GridNodeData tempNodeData = new GridNodeData();
+            Node node = nodeList[i].GetComponent<Node>();
+
+            tempNodeData.index = i;
+            tempNodeData.weight = node.getWeight();
+            tempNodeData.ponderedWeight = node.getPonderedWeight();
+            tempNodeData.position = node.getPosition();
+            tempNodeData.parentNodeIndex = 0;
+            tempNodeData.neighbourNodeIndex = node.getNeighbourNodesIndex();
+            tempNodeData.walkable = node.isWalkable();
+            tempNodeData.zombie = node.isZombie();
+            tempNodeData.player = node.isPlayer();
+
+            gridNodeData[i] = tempNodeData;
+        }
     }
 
     void GenerateNeighbours()
@@ -52,6 +70,7 @@ public class NodeGenerator : MonoBehaviour
                 if ( (nodeIndex + (2*zMax)) < ((2*xMax)*(2*zMax)) )
                 {
                     noeud.addNeighbourNode(nodeList[(int)(nodeIndex + (2*zMax)+1)]);
+                    noeud.addNeighbourNodeIndex((int)(nodeIndex + (2 * zMax) + 1));
                     upperNode = nodeList[(int)(nodeIndex + (2 * zMax) + 1)].GetComponent<Node>();
                 }
 
@@ -59,6 +78,7 @@ public class NodeGenerator : MonoBehaviour
                 if ( (nodeIndex - (2*zMax)) >= 0)
                 {
                     noeud.addNeighbourNode(nodeList[(int)(nodeIndex - (2*zMax))]);
+                    noeud.addNeighbourNodeIndex((int)(nodeIndex - (2 * zMax)));
                     lowerNode = nodeList[(int)(nodeIndex - (2 * zMax))].GetComponent<Node>();
                 }
 
@@ -66,6 +86,7 @@ public class NodeGenerator : MonoBehaviour
                 if ( (nodeIndex + 1) < ((2*xMax)*(2*zMax)) )
                 {
                     noeud.addNeighbourNode(nodeList[(nodeIndex + 1)]);
+                    noeud.addNeighbourNodeIndex((nodeIndex + 1));
                     rightNode = nodeList[(nodeIndex + 1)].GetComponent<Node>();
                 }
 
@@ -73,6 +94,7 @@ public class NodeGenerator : MonoBehaviour
                 if ( (nodeIndex - 1) >= 0)
                 {
                     noeud.addNeighbourNode(nodeList[(nodeIndex - 1)]);
+                    noeud.addNeighbourNodeIndex((nodeIndex - 1));
                     leftNode = nodeList[(nodeIndex - 1)].GetComponent<Node>();
                 }
 
@@ -83,21 +105,25 @@ public class NodeGenerator : MonoBehaviour
                 if ( ((nodeIndex + (2 * zMax)+1) < ((2 * xMax) * (2 * zMax))) & (upperNode.isWalkable() & rightNode.isWalkable()) )
                 {
                     noeud.addNeighbourNode(nodeList[(int)(nodeIndex + (2 * zMax) + 2)]);
+                    noeud.addNeighbourNodeIndex((int)(nodeIndex + (2 * zMax) + 2));
                 }
                 //Upper Left neighbour
                 if (((nodeIndex + (2 * zMax)-1) < ((2 * xMax) * (2 * zMax))) & (upperNode.isWalkable() & leftNode.isWalkable()))
                 {
                     noeud.addNeighbourNode(nodeList[(int)(nodeIndex + (2 * zMax))]);
+                    noeud.addNeighbourNodeIndex((int)(nodeIndex + (2 * zMax)));
                 }
                 //Lower Right neighbour
                 if (((nodeIndex - (2 * zMax)+1) >= 0) & (lowerNode.isWalkable() & rightNode.isWalkable()))
                 {
                     noeud.addNeighbourNode(nodeList[(int)(nodeIndex - (2 * zMax))+1]);
+                    noeud.addNeighbourNodeIndex((int)(nodeIndex - (2 * zMax))+1);
                 }
                 //Lower Left neighbour
                 if (((nodeIndex - (2 * zMax)-1) >= 0) & (lowerNode.isWalkable() & leftNode.isWalkable()))
                 {
                     noeud.addNeighbourNode(nodeList[(int)(nodeIndex - (2 * zMax))-1]);
+                    noeud.addNeighbourNodeIndex((int)(nodeIndex - (2 * zMax))-1);
                 }
 
                 nodeIndex++;              
@@ -114,7 +140,7 @@ public class NodeGenerator : MonoBehaviour
                 GameObject nodeObj = GameObject.Instantiate(nodePrefab);
                 nodeObj.transform.parent = gameObject.transform;
                 Node noeud = nodeObj.GetComponent<Node>();
-                noeud.setPosition(new Vector3(x, 0f, z));
+                noeud.setPosition(new Vector3(x, 1f, z));
                 nodeObj.transform.position = noeud.getPosition();
 
                 if (nodeObj.transform.position.z == zMax |
@@ -126,7 +152,7 @@ public class NodeGenerator : MonoBehaviour
                     noeud.setWalkable(false);
                     GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                     cube.transform.parent = nodeObj.transform;
-                    cube.transform.localPosition = new Vector3(0f, 2.5f, 0f);
+                    cube.transform.localPosition = new Vector3(0f, 1.5f, 0f);
                     cube.transform.localScale = new Vector3(1f, 5f, 1f);
                     BoxCollider cubeCollider = cube.GetComponent<BoxCollider>();
                     cubeCollider.size.Set(1f,5f,1f);
@@ -159,7 +185,7 @@ public class NodeGenerator : MonoBehaviour
         }
         GameObject playerObj = GameObject.Instantiate(playerPrefab, new Vector3(playerPos.x,1f,playerPos.z), new Quaternion());
         PlayerController pCtrl = playerObj.GetComponent<PlayerController>();
-        pCtrl.LinkToNearNeighbours();
+        //pCtrl.LinkToNearNeighbours();
     }
 
     void GenerateSpawns()

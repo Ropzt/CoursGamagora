@@ -16,7 +16,7 @@ public class PlayerMouvement : MonoBehaviour
     public float jumpHeight = 2f;
 
     public Transform groundCheck;
-    public float groundDistance = 0.4f;
+    public float groundDistance;
     public LayerMask groundMask;
 
 
@@ -56,6 +56,7 @@ public class PlayerMouvement : MonoBehaviour
         bool jumpPressed = false;
 
 #if ENABLE_INPUT_SYSTEM
+
         var delta = movement.ReadValue<Vector2>();
         x = delta.x;
         z = delta.y;
@@ -67,12 +68,10 @@ public class PlayerMouvement : MonoBehaviour
 #endif
 
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
-
         if (isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
         }
-
         Vector3 move = transform.right * x + transform.forward * z;
 
         controller.Move(move * speed * Time.deltaTime);

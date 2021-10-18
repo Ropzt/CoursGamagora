@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class AstarPathfinding : MonoBehaviour
 {
-
+    
+    NodeGenerator grid;
 
     public List<GameObject> findShortestPath(GameObject start, GameObject end)
     {
@@ -26,7 +27,7 @@ public class AstarPathfinding : MonoBehaviour
 
     private GameObject DijkstrasAlgo(GameObject start, GameObject end)
     {
-        NodeGenerator grid = GameObject.FindGameObjectWithTag("Grid").GetComponent<NodeGenerator>();
+        
 
         // Nodes that are unexplored
         List<GameObject> unexplored = new List<GameObject>();
