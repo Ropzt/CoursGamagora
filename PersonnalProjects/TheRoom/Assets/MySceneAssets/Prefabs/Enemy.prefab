@@ -150,7 +150,7 @@ MonoBehaviour:
   steerWeight: 10
   health: 100
   attack: 50
-  range: 50
+  range: 30
   isPathReady: 0
 --- !u!114 &6873015008624514720
 MonoBehaviour:

@@ -44,6 +44,7 @@ public class GridNode4Threading : MonoBehaviour
         if (playerObj != null)
         {
             zba.isPathReady = false;
+            Debug.Log("Astar Launching");
             // Launch A* Thread
             findShortestPath();
         }

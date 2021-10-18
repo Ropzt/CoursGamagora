@@ -109,7 +109,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 1000
   range: 100
-  attack: 100
+  attack: 50
+  nearestNodePosition: {x: 0, y: 0, z: 0}
 --- !u!1 &5346597949067531215
 GameObject:
   m_ObjectHideFlags: 0

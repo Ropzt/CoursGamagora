@@ -18,8 +18,8 @@ public class ZombieBehaviorAstar : MonoBehaviour
     [HideInInspector] public List<Vector3> path;
 
     [SerializeField] private float steerWeight = 10f;
-    [SerializeField] private float health;
-    [SerializeField] private float attack;
+    private float health;
+    private float attack;
     [SerializeField] private float range;
     private bool isAttacking = false;
 
@@ -56,6 +56,8 @@ public class ZombieBehaviorAstar : MonoBehaviour
         genome.Init();
         health = genome.geneVector.x;
         attack = genome.geneVector.z;
+
+        mov.Init();
 
         pathIndex = 0;
         shortPathA.Init();

@@ -412,7 +412,7 @@ MonoBehaviour:
   nodePrefab: {fileID: 6553718954582962328, guid: 729ecfdbb74ebe94fb08fc66de7015fb, type: 3}
   playerPrefab: {fileID: 5346597948088358579, guid: 3eabb444ca0d5a24dbdf4c1f2afe2c2c, type: 3}
   spawnManagerPrefab: {fileID: 4982413590100933281, guid: 9f4869dcf927bb34b80fe8d1862d72b3, type: 3}
-  nb_Spawn: 5
+  nb_Spawn: 2
   xMax: 0
   zMax: 0
   nodeList: []
@@ -459,7 +459,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e29decce9065b74d82009987f7e5e7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseHealth: 50
+  baseHealth: 100
   baseSpeed: 10
   baseAttack: 10
   baseGenome: {x: 0, y: 0, z: 0}

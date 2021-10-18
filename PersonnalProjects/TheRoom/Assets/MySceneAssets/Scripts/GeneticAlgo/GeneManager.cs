@@ -35,7 +35,6 @@ public class GeneManager : MonoBehaviour
     {
         baseGenome = new Vector3(baseHealth,baseSpeed, baseAttack);
         bestScore = 0;
-        Debug.Log("Init gene manager");
     }
 
     public void CheckForNewBest(float damage, Vector3 geneVector)

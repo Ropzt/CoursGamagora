@@ -5,7 +5,7 @@ using UnityEngine;
 public class Movement : MonoBehaviour
 {
     public float minSpeed = 2;
-    public float maxSpeed = 5;
+    [HideInInspector] public float maxSpeed;
     public float maxSteerForce = 3;
 
     // State
@@ -19,7 +19,7 @@ public class Movement : MonoBehaviour
     public Transform cachedTransform;
     
     // Start is called before the first frame update
-    void Start()
+    public void Init()
     {
         //Separate transform.position from computation by using temp values (cachedTransform,position,forward)
         cachedTransform = transform;
@@ -28,6 +28,10 @@ public class Movement : MonoBehaviour
 
         //Set initial movement
         velocity = transform.forward * minSpeed;
+
+        //Set Speed decided by evolution
+        Genome genome = GetComponent<Genome>();
+        maxSpeed = genome.geneVector.y;
     }
 
     public void Move(Vector3 acceleration)
